@@ -90,7 +90,9 @@
     .search-box select,
     .suggestion-form input,
     .suggestion-form textarea,
-    .admin-login-form input {
+    .admin-login-form input,
+    .admin-product-form input,
+    .admin-product-form textarea {
       padding: 8px 10px;
       font-size: 16px;
       background: var(--input-bg);
@@ -102,7 +104,9 @@
     .search-box input::placeholder,
     .suggestion-form input::placeholder,
     .suggestion-form textarea::placeholder,
-    .admin-login-form input::placeholder {
+    .admin-login-form input::placeholder,
+    .admin-product-form input::placeholder,
+    .admin-product-form textarea::placeholder {
       color: #888;
     }
 
@@ -116,7 +120,8 @@
 
     .search-box button,
     .suggestion-form button,
-    .admin-login-form button {
+    .admin-login-form button,
+    .admin-product-form button {
       padding: 8px 16px;
       font-size: 16px;
       cursor: pointer;
@@ -130,7 +135,8 @@
 
     .search-box button:hover,
     .suggestion-form button:hover,
-    .admin-login-form button:hover {
+    .admin-login-form button:hover,
+    .admin-product-form button:hover {
       transform: translateY(-1px);
     }
 
@@ -440,6 +446,65 @@
       background: rgba(255,255,255,0.06);
     }
 
+    .admin-product-form {
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+
+    .admin-product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .admin-product-grid textarea {
+      grid-column: 1 / -1;
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .admin-product-form-buttons {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .admin-products-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .admin-products-table th,
+    .admin-products-table td {
+      border: 1px solid var(--input-border);
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .admin-products-table th {
+      background: rgba(0,0,0,0.1);
+      font-weight: bold;
+    }
+
+    .admin-product-actions-btn {
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid var(--input-border);
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+      margin-right: 4px;
+    }
+
+    .admin-product-actions-btn:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
     /* Suggestion Box */
     #suggestionSection {
       margin-top: 30px;
@@ -505,6 +570,7 @@
       gap: 8px;
       margin-bottom: 4px;
       font-weight: bold;
+      align-items: center;
     }
 
     .suggestion-card-meta {
@@ -527,6 +593,26 @@
       background: rgba(255,255,255,0.06);
     }
 
+    .suggestion-admin-buttons button {
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid var(--input-border);
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+    .suggestion-admin-buttons button:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 600px) {
       .top-bar {
         flex-direction: column;
@@ -539,6 +625,9 @@
         width: 100%;
       }
       .suggestion-form {
+        grid-template-columns: 1fr;
+      }
+      .admin-product-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -618,8 +707,29 @@
         <button type="button" class="admin-btn" onclick="copySuggestions()">Copy suggestions (CSV)</button>
       </div>
       <p style="font-size:13px; opacity:0.8;">
-        As admin you can delete individual suggestions or clear them all.
+        As admin you can manage products and suggestions.
       </p>
+
+      <h3 style="margin-top:12px; font-size:16px;">Manage Products</h3>
+      <form id="productForm" class="admin-product-form">
+        <div class="admin-product-grid">
+          <input type="text" id="prodBrand" placeholder="Brand (e.g. DVDO)">
+          <input type="text" id="prodModel" placeholder="Model (required)" required>
+          <input type="text" id="prodName" placeholder="Product name / title">
+          <input type="text" id="prodCategory" placeholder="Category (camera, converter, accessory)">
+          <input type="text" id="prodImage" placeholder="Image URL (optional)">
+          <textarea id="prodDescription" placeholder="Description"></textarea>
+          <textarea id="prodSpecs" placeholder="Specs (one per line, e.g. Resolution: 1080p)"></textarea>
+        </div>
+        <div class="admin-product-form-buttons">
+          <button type="submit" id="productFormSubmitBtn">Add product</button>
+          <button type="button" id="productFormCancelEditBtn" style="display:none;" onclick="cancelProductEdit()">
+            Cancel edit
+          </button>
+        </div>
+      </form>
+
+      <div id="adminProductsList"></div>
     </div>
   </section>
 
@@ -649,7 +759,9 @@
   </section>
 
   <script>
-    const products = [
+    /* ---------- DATA & STORAGE ---------- */
+
+    const DEFAULT_PRODUCTS = [
       {
         model: "DVDO-C4-1-B",
         brand: "DVDO",
@@ -737,6 +849,21 @@
       }
     ];
 
+    let products = [];
+    let compareSelection = [];
+    let cart = [];         // { model, name, brand, description, quantity }
+    let suggestions = [];  // { brand, model, name, notes, createdAt }
+
+    const PRODUCTS_STORAGE_KEY    = "inventoryProducts";
+    const SUGGESTIONS_STORAGE_KEY = "inventorySuggestions";
+    const ADMIN_SESSION_KEY       = "inventoryIsAdmin";
+    const ADMIN_PASSWORD          = "JAY-ADMIN-2025"; // change if you want
+
+    let isAdmin = false;
+    let editingProductIndex = null;
+
+    /* ---------- DOM ELEMENTS ---------- */
+
     const searchInput       = document.getElementById("searchInput");
     const searchButton      = document.getElementById("searchButton");
     const noResultEl        = document.getElementById("noResult");
@@ -768,15 +895,60 @@
     const adminLoggedIn    = document.getElementById("adminLoggedIn");
     const adminStatusText  = document.getElementById("adminStatusText");
 
-    let compareSelection = [];
-    let cart = []; // { model, name, brand, description, quantity }
-    let suggestions = []; // { brand, model, name, notes, createdAt }
+    // Admin product form
+    const productForm                 = document.getElementById("productForm");
+    const prodBrandInput              = document.getElementById("prodBrand");
+    const prodModelInput              = document.getElementById("prodModel");
+    const prodNameInput               = document.getElementById("prodName");
+    const prodCategoryInput           = document.getElementById("prodCategory");
+    const prodImageInput              = document.getElementById("prodImage");
+    const prodDescriptionInput        = document.getElementById("prodDescription");
+    const prodSpecsInput              = document.getElementById("prodSpecs");
+    const productFormSubmitBtn        = document.getElementById("productFormSubmitBtn");
+    const productFormCancelEditBtn    = document.getElementById("productFormCancelEditBtn");
+    const adminProductsList           = document.getElementById("adminProductsList");
 
-    const SUGGESTIONS_STORAGE_KEY = "inventorySuggestions";
-    const ADMIN_SESSION_KEY = "inventoryIsAdmin";
-    const ADMIN_PASSWORD = "JAY-ADMIN-2025"; // Change this to anything you like
+    /* ---------- STORAGE HELPERS ---------- */
 
-    let isAdmin = false;
+    function loadProducts() {
+      try {
+        const raw = localStorage.getItem(PRODUCTS_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length) {
+            products = parsed;
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to load products, using defaults.", e);
+      }
+      products = DEFAULT_PRODUCTS.slice();
+    }
+
+    function saveProducts() {
+      try {
+        localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(products));
+      } catch (e) {
+        console.warn("Failed to save products.", e);
+      }
+    }
+
+    function loadSuggestions() {
+      try {
+        const raw = localStorage.getItem(SUGGESTIONS_STORAGE_KEY);
+        if (raw) {
+          suggestions = JSON.parse(raw) || [];
+        }
+      } catch (e) {
+        suggestions = [];
+      }
+      renderSuggestions();
+    }
+
+    function saveSuggestions() {
+      localStorage.setItem(SUGGESTIONS_STORAGE_KEY, JSON.stringify(suggestions));
+    }
 
     /* ---------- THEME TOGGLE ---------- */
 
@@ -816,8 +988,8 @@
 
       setTimeout(() => {
         const matches = products.filter(p => {
-          const model = p.model.toLowerCase();
-          const name  = p.name.toLowerCase();
+          const model = (p.model || "").toLowerCase();
+          const name  = (p.name || "").toLowerCase();
           const brand = (p.brand || "").toLowerCase();
           const matchesText =
             !query ||
@@ -850,7 +1022,7 @@
                 <h2 class="result-name">${product.name}</h2>
                 <p class="result-meta">
                   <strong>Brand:</strong> ${product.brand || "-"} |
-                  <strong>Category:</strong> ${product.category.toUpperCase()}
+                  <strong>Category:</strong> ${(product.category || "").toUpperCase()}
                 </p>
               </div>
               <div class="result-actions">
@@ -867,15 +1039,15 @@
                 </button>
               </div>
             </div>
-            <p class="result-description">${product.description}</p>
-            <img class="result-image" src="${product.image}" alt="${product.name}">
+            <p class="result-description">${product.description || ""}</p>
+            ${product.image ? `<img class="result-image" src="${product.image}" alt="${product.name}">` : ""}
           `;
 
           resultsContainer.appendChild(card);
         });
 
         renderCompare();
-      }, 500);
+      }, 400);
     }
 
     searchButton.addEventListener("click", searchProduct);
@@ -883,9 +1055,6 @@
       if (event.key === "Enter") searchProduct();
     });
     categorySelect.addEventListener("change", searchProduct);
-
-    // Initial load
-    searchProduct();
 
     /* ---------- COMPARE ---------- */
 
@@ -947,7 +1116,7 @@
             <th>Image</th>
             ${selectedProducts.map(p => `
               <td>
-                <img class="compare-image" src="${p.image}" alt="${p.name}">
+                ${p.image ? `<img class="compare-image" src="${p.image}" alt="${p.name}">` : "-"}
               </td>
             `).join("")}
           </tr>
@@ -961,11 +1130,11 @@
           </tr>
           <tr>
             <th>Category</th>
-            ${selectedProducts.map(p => `<td>${p.category.toUpperCase()}</td>`).join("")}
+            ${selectedProducts.map(p => `<td>${(p.category || "").toUpperCase()}</td>`).join("")}
           </tr>
           <tr>
             <th>Description</th>
-            ${selectedProducts.map(p => `<td>${p.description}</td>`).join("")}
+            ${selectedProducts.map(p => `<td>${p.description || ""}</td>`).join("")}
           </tr>
       `;
 
@@ -1005,7 +1174,7 @@
           model: product.model,
           name: product.name,
           brand: product.brand || "",
-          description: product.description,
+          description: product.description || "",
           quantity: 1
         });
       }
@@ -1119,23 +1288,32 @@
       URL.revokeObjectURL(url);
     }
 
-    /* ---------- SUGGESTION BOX ---------- */
+    /* ---------- SPECS PARSE HELPERS ---------- */
 
-    function loadSuggestions() {
-      try {
-        const raw = localStorage.getItem(SUGGESTIONS_STORAGE_KEY);
-        if (raw) {
-          suggestions = JSON.parse(raw) || [];
+    function parseSpecsFromString(text) {
+      const specs = {};
+      if (!text) return specs;
+      const lines = text.split(/\r?\n/);
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+        const [key, ...rest] = trimmed.split(":");
+        const value = rest.join(":").trim();
+        if (key) {
+          specs[key.trim()] = value || "";
         }
-      } catch (e) {
-        suggestions = [];
-      }
-      renderSuggestions();
+      });
+      return specs;
     }
 
-    function saveSuggestions() {
-      localStorage.setItem(SUGGESTIONS_STORAGE_KEY, JSON.stringify(suggestions));
+    function specsToText(specs) {
+      if (!specs || typeof specs !== "object") return "";
+      return Object.entries(specs)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join("\n");
     }
+
+    /* ---------- SUGGESTION BOX ---------- */
 
     function renderSuggestions() {
       if (!suggestions.length) {
@@ -1150,7 +1328,12 @@
         <div class="suggestion-card">
           <div class="suggestion-card-header">
             <span>${s.brand || "-"} • ${s.model || "-"}</span>
-            ${isAdmin ? `<button type="button" class="remove-cart-btn" onclick="deleteSuggestion(${index})">Delete</button>` : ""}
+            ${isAdmin ? `
+              <span class="suggestion-admin-buttons">
+                <button type="button" onclick="approveSuggestion(${index})">Approve</button>
+                <button type="button" onclick="deleteSuggestion(${index})">Delete</button>
+              </span>
+            ` : ""}
           </div>
           <div class="suggestion-card-meta">
             ${s.name ? `${s.name} • ` : ""}${s.createdAt}
@@ -1237,20 +1420,233 @@
       }
     }
 
+    function approveSuggestion(index) {
+      if (!isAdmin) {
+        alert("Admin only.");
+        return;
+      }
+      const s = suggestions[index];
+      if (!s) return;
+
+      const defaultName = (s.name || `${s.brand || ""} ${s.model || ""}`).trim();
+      let category = prompt("Enter category for this product (camera / converter / accessory):", "converter");
+      if (!category) category = "converter";
+      category = category.toLowerCase();
+
+      const image = prompt("Enter image URL for this product (optional):", "") || "";
+
+      const specsText = prompt("Enter basic specs (optional, one per line as 'Key: Value'):", "");
+      const specs = parseSpecsFromString(specsText);
+
+      const newProduct = {
+        model: s.model || "",
+        brand: s.brand || "",
+        name: defaultName || "New Product",
+        category,
+        description: s.notes || s.name || "",
+        image,
+        specs
+      };
+
+      if (!newProduct.model) {
+        alert("Suggestion has no model, cannot create product.");
+        return;
+      }
+
+      const existingIndex = products.findIndex(p => p.model === newProduct.model);
+      if (existingIndex !== -1) {
+        if (!confirm("A product with this model already exists. Replace it?")) {
+          return;
+        }
+        products[existingIndex] = newProduct;
+      } else {
+        products.push(newProduct);
+      }
+
+      saveProducts();
+      suggestions.splice(index, 1);
+      saveSuggestions();
+
+      renderSuggestions();
+      renderAdminProducts();
+      searchProduct();
+    }
+
+    /* ---------- ADMIN PRODUCT MANAGEMENT ---------- */
+
+    function renderAdminProducts() {
+      if (!isAdmin) {
+        adminProductsList.innerHTML = `
+          <p style="font-size:13px; opacity:0.8;">
+            Login as admin to manage products.
+          </p>
+        `;
+        return;
+      }
+
+      if (!products.length) {
+        adminProductsList.innerHTML = `
+          <p style="font-size:13px; opacity:0.8;">
+            No products found. Use the form above to add one.
+          </p>
+        `;
+        return;
+      }
+
+      const rowsHtml = products.map((p, index) => `
+        <tr>
+          <td>${p.brand || "-"}</td>
+          <td>${p.model}</td>
+          <td>${p.name || ""}</td>
+          <td>${(p.category || "").toUpperCase()}</td>
+          <td>
+            <button type="button" class="admin-product-actions-btn" onclick="startEditProduct(${index})">
+              Edit
+            </button>
+            <button type="button" class="admin-product-actions-btn" onclick="deleteProduct(${index})">
+              Delete
+            </button>
+          </td>
+        </tr>
+      `).join("");
+
+      adminProductsList.innerHTML = `
+        <table class="admin-products-table">
+          <tr>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Actions</th>
+          </tr>
+          ${rowsHtml}
+        </table>
+      `;
+    }
+
+    productForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!isAdmin) {
+        alert("Admin only.");
+        return;
+      }
+
+      const brand       = prodBrandInput.value.trim();
+      const model       = prodModelInput.value.trim();
+      const name        = prodNameInput.value.trim();
+      let category      = prodCategoryInput.value.trim().toLowerCase();
+      const image       = prodImageInput.value.trim();
+      const description = prodDescriptionInput.value.trim();
+      const specsText   = prodSpecsInput.value.trim();
+      const specs       = parseSpecsFromString(specsText);
+
+      if (!model) {
+        alert("Model is required.");
+        return;
+      }
+      if (!category) {
+        category = "converter";
+      }
+
+      const productData = {
+        model,
+        brand,
+        name: name || `${brand} ${model}`.trim() || "New Product",
+        category,
+        description,
+        image,
+        specs
+      };
+
+      if (editingProductIndex !== null) {
+        products[editingProductIndex] = productData;
+      } else {
+        const existingIndex = products.findIndex(p => p.model === model);
+        if (existingIndex !== -1) {
+          if (!confirm("A product with this model already exists. Replace it?")) {
+            return;
+          }
+          products[existingIndex] = productData;
+        } else {
+          products.push(productData);
+        }
+      }
+
+      saveProducts();
+      productForm.reset();
+      editingProductIndex = null;
+      productFormSubmitBtn.textContent = "Add product";
+      productFormCancelEditBtn.style.display = "none";
+      renderAdminProducts();
+      searchProduct();
+    });
+
+    function startEditProduct(index) {
+      if (!isAdmin) return;
+      const p = products[index];
+      if (!p) return;
+
+      editingProductIndex = index;
+      prodBrandInput.value       = p.brand || "";
+      prodModelInput.value       = p.model || "";
+      prodNameInput.value        = p.name || "";
+      prodCategoryInput.value    = p.category || "";
+      prodImageInput.value       = p.image || "";
+      prodDescriptionInput.value = p.description || "";
+      prodSpecsInput.value       = specsToText(p.specs);
+
+      productFormSubmitBtn.textContent = "Save changes";
+      productFormCancelEditBtn.style.display = "inline-block";
+
+      window.scrollTo({
+        top: document.getElementById("adminSection").offsetTop,
+        behavior: "smooth"
+      });
+    }
+
+    function deleteProduct(index) {
+      if (!isAdmin) return;
+      const p = products[index];
+      if (!p) return;
+
+      if (!confirm(`Delete product ${p.model}?`)) return;
+
+      const model = p.model;
+
+      products.splice(index, 1);
+      saveProducts();
+
+      // Also clean up cart and compare
+      compareSelection = compareSelection.filter(m => m !== model);
+      cart = cart.filter(item => item.model !== model);
+
+      renderAdminProducts();
+      renderCart();
+      renderCompare();
+      searchProduct();
+    }
+
+    function cancelProductEdit() {
+      editingProductIndex = null;
+      productForm.reset();
+      productFormSubmitBtn.textContent = "Add product";
+      productFormCancelEditBtn.style.display = "none";
+    }
+
     /* ---------- ADMIN LOGIN ---------- */
 
     function updateAdminUI() {
       if (isAdmin) {
-        adminLoggedIn.style.display = "block";
+        adminLoggedIn.style.display  = "block";
         adminLoggedOut.style.display = "none";
-        adminStatusText.textContent = "Admin logged in.";
+        adminStatusText.textContent  = "Admin logged in.";
       } else {
-        adminLoggedIn.style.display = "none";
+        adminLoggedIn.style.display  = "none";
         adminLoggedOut.style.display = "block";
-        adminStatusText.textContent = "Not logged in.";
+        adminStatusText.textContent  = "Not logged in.";
       }
-      // Re-render suggestions so delete buttons appear/disappear
       renderSuggestions();
+      renderAdminProducts();
     }
 
     adminLoginForm.addEventListener("submit", (event) => {
@@ -1280,21 +1676,28 @@
       updateAdminUI();
     }
 
-    // Init suggestions + admin on startup
+    /* ---------- INIT ---------- */
+
+    loadProducts();
     loadSuggestions();
     initAdmin();
+    searchProduct();
 
-    // Expose functions
-    window.toggleCompare      = toggleCompare;
-    window.clearCompare       = clearCompare;
-    window.addToCart          = addToCart;
-    window.removeFromCart     = removeFromCart;
-    window.updateCartQuantity = updateCartQuantity;
-    window.downloadQuotation  = downloadQuotation;
-    window.copySuggestions    = copySuggestions;
-    window.deleteSuggestion   = deleteSuggestion;
-    window.clearAllSuggestions = clearAllSuggestions;
-    window.adminLogout        = adminLogout;
+    // Expose functions for inline handlers
+    window.toggleCompare        = toggleCompare;
+    window.clearCompare         = clearCompare;
+    window.addToCart            = addToCart;
+    window.removeFromCart       = removeFromCart;
+    window.updateCartQuantity   = updateCartQuantity;
+    window.downloadQuotation    = downloadQuotation;
+    window.copySuggestions      = copySuggestions;
+    window.deleteSuggestion     = deleteSuggestion;
+    window.clearAllSuggestions  = clearAllSuggestions;
+    window.approveSuggestion    = approveSuggestion;
+    window.startEditProduct     = startEditProduct;
+    window.deleteProduct        = deleteProduct;
+    window.cancelProductEdit    = cancelProductEdit;
+    window.adminLogout          = adminLogout;
   </script>
 </body>
 </html>
