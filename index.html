@@ -89,7 +89,8 @@
     .search-box input,
     .search-box select,
     .suggestion-form input,
-    .suggestion-form textarea {
+    .suggestion-form textarea,
+    .admin-login-form input {
       padding: 8px 10px;
       font-size: 16px;
       background: var(--input-bg);
@@ -100,7 +101,8 @@
 
     .search-box input::placeholder,
     .suggestion-form input::placeholder,
-    .suggestion-form textarea::placeholder {
+    .suggestion-form textarea::placeholder,
+    .admin-login-form input::placeholder {
       color: #888;
     }
 
@@ -113,7 +115,8 @@
     }
 
     .search-box button,
-    .suggestion-form button {
+    .suggestion-form button,
+    .admin-login-form button {
       padding: 8px 16px;
       font-size: 16px;
       cursor: pointer;
@@ -126,7 +129,8 @@
     }
 
     .search-box button:hover,
-    .suggestion-form button:hover {
+    .suggestion-form button:hover,
+    .admin-login-form button:hover {
       transform: translateY(-1px);
     }
 
@@ -382,6 +386,60 @@
       opacity: 0.9;
     }
 
+    /* Admin section */
+    #adminSection {
+      margin-top: 30px;
+      padding: 16px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--input-border);
+    }
+
+    #adminSection h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .admin-login-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .admin-login-form input {
+      flex: 1 1 160px;
+    }
+
+    .admin-status {
+      font-size: 13px;
+      opacity: 0.8;
+      margin-bottom: 6px;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .admin-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--input-border);
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .admin-btn:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
     /* Suggestion Box */
     #suggestionSection {
       margin-top: 30px;
@@ -533,6 +591,38 @@
     <div id="compareContainer"></div>
   </section>
 
+  <!-- Admin Panel -->
+  <section id="adminSection">
+    <h2>Admin Panel</h2>
+    <p class="admin-status" id="adminStatusText">Not logged in.</p>
+
+    <div id="adminLoggedOut">
+      <form id="adminLoginForm" class="admin-login-form">
+        <input
+          type="password"
+          id="adminPassword"
+          placeholder="Enter admin password"
+          required
+        >
+        <button type="submit">Login</button>
+      </form>
+      <p style="font-size:12px; opacity:0.7;">
+        Note: This is a simple frontend-only password. Do not use a real company password here.
+      </p>
+    </div>
+
+    <div id="adminLoggedIn" style="display:none;">
+      <div class="admin-actions">
+        <button type="button" class="admin-btn" onclick="adminLogout()">Logout</button>
+        <button type="button" class="admin-btn" onclick="clearAllSuggestions()">Clear all suggestions</button>
+        <button type="button" class="admin-btn" onclick="copySuggestions()">Copy suggestions (CSV)</button>
+      </div>
+      <p style="font-size:13px; opacity:0.8;">
+        As admin you can delete individual suggestions or clear them all.
+      </p>
+    </div>
+  </section>
+
   <!-- Suggestion Box -->
   <section id="suggestionSection">
     <h2>Product Suggestion Box</h2>
@@ -543,7 +633,7 @@
     <form id="suggestionForm" class="suggestion-form">
       <input type="text" id="suggestBrand" placeholder="Brand (e.g. SONY)" required>
       <input type="text" id="suggestModel" placeholder="Model (e.g. PXW-Z90)" required>
-      <input type="text" id="suggestName" placeholder="Product name / short title" >
+      <input type="text" id="suggestName" placeholder="Product name / short title">
       <textarea id="suggestNotes" placeholder="Extra details (link, specs, customer request, etc.)"></textarea>
       <button type="submit">Add suggestion</button>
     </form>
@@ -671,11 +761,22 @@
     const suggestionsListEl    = document.getElementById("suggestionsList");
     const suggestionCountText  = document.getElementById("suggestionCountText");
 
+    // Admin elements
+    const adminLoginForm   = document.getElementById("adminLoginForm");
+    const adminPasswordInp = document.getElementById("adminPassword");
+    const adminLoggedOut   = document.getElementById("adminLoggedOut");
+    const adminLoggedIn    = document.getElementById("adminLoggedIn");
+    const adminStatusText  = document.getElementById("adminStatusText");
+
     let compareSelection = [];
     let cart = []; // { model, name, brand, description, quantity }
     let suggestions = []; // { brand, model, name, notes, createdAt }
 
     const SUGGESTIONS_STORAGE_KEY = "inventorySuggestions";
+    const ADMIN_SESSION_KEY = "inventoryIsAdmin";
+    const ADMIN_PASSWORD = "JAY-ADMIN-2025"; // Change this to anything you like
+
+    let isAdmin = false;
 
     /* ---------- THEME TOGGLE ---------- */
 
@@ -1045,10 +1146,11 @@
 
       suggestionCountText.textContent = `Total suggestions: ${suggestions.length}`;
 
-      suggestionsListEl.innerHTML = suggestions.map(s => `
+      suggestionsListEl.innerHTML = suggestions.map((s, index) => `
         <div class="suggestion-card">
           <div class="suggestion-card-header">
             <span>${s.brand || "-"} • ${s.model || "-"}</span>
+            ${isAdmin ? `<button type="button" class="remove-cart-btn" onclick="deleteSuggestion(${index})">Delete</button>` : ""}
           </div>
           <div class="suggestion-card-meta">
             ${s.name ? `${s.name} • ` : ""}${s.createdAt}
@@ -1111,8 +1213,76 @@
       }
     }
 
-    // Load suggestions on startup
+    function deleteSuggestion(index) {
+      suggestions.splice(index, 1);
+      saveSuggestions();
+      renderSuggestions();
+    }
+
+    function clearAllSuggestions() {
+      if (!isAdmin) {
+        alert("Admin only.");
+        return;
+      }
+
+      if (!suggestions.length) {
+        alert("No suggestions to clear.");
+        return;
+      }
+
+      if (confirm("Are you sure you want to delete ALL suggestions?")) {
+        suggestions = [];
+        saveSuggestions();
+        renderSuggestions();
+      }
+    }
+
+    /* ---------- ADMIN LOGIN ---------- */
+
+    function updateAdminUI() {
+      if (isAdmin) {
+        adminLoggedIn.style.display = "block";
+        adminLoggedOut.style.display = "none";
+        adminStatusText.textContent = "Admin logged in.";
+      } else {
+        adminLoggedIn.style.display = "none";
+        adminLoggedOut.style.display = "block";
+        adminStatusText.textContent = "Not logged in.";
+      }
+      // Re-render suggestions so delete buttons appear/disappear
+      renderSuggestions();
+    }
+
+    adminLoginForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const pwd = adminPasswordInp.value;
+      if (pwd === ADMIN_PASSWORD) {
+        isAdmin = true;
+        sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
+        adminPasswordInp.value = "";
+        updateAdminUI();
+      } else {
+        alert("Incorrect admin password.");
+      }
+    });
+
+    function adminLogout() {
+      isAdmin = false;
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      updateAdminUI();
+    }
+
+    function initAdmin() {
+      const stored = sessionStorage.getItem(ADMIN_SESSION_KEY);
+      if (stored === "true") {
+        isAdmin = true;
+      }
+      updateAdminUI();
+    }
+
+    // Init suggestions + admin on startup
     loadSuggestions();
+    initAdmin();
 
     // Expose functions
     window.toggleCompare      = toggleCompare;
@@ -1122,6 +1292,9 @@
     window.updateCartQuantity = updateCartQuantity;
     window.downloadQuotation  = downloadQuotation;
     window.copySuggestions    = copySuggestions;
+    window.deleteSuggestion   = deleteSuggestion;
+    window.clearAllSuggestions = clearAllSuggestions;
+    window.adminLogout        = adminLogout;
   </script>
 </body>
 </html>
