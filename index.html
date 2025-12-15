@@ -644,9 +644,14 @@ body{
 /* ===== MAIN LAYOUT ===== */
 .layout {
   display: grid;
-  grid-template-columns: 1fr 340px; /* products | cart */
+  grid-template-columns: 1fr 460px; /* products | cart */
   gap: 16px;
   align-items: start;
+}
+    
+  .cart-table td:nth-child(3) {
+  white-space: normal;
+  word-break: break-word;
 }
 
 /* RIGHT SIDE stays visible */
