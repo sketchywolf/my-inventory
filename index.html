@@ -648,14 +648,34 @@
   overflow-y: auto;
 }
 
-/* Cart section itself should NOT be sticky */
-.sticky-cart {
-  position: static;
-  max-height: none;
-  overflow: visible;
+/* ===== MAIN LAYOUT ===== */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px; /* products | cart */
+  gap: 16px;
+  align-items: start;
 }
 
-/* Mobile: stack cart under products */
+/* LEFT SIDE scrolls normally */
+.main {
+  min-height: 100vh;
+}
+
+/* RIGHT SIDE stays visible */
+.sidebar {
+  position: sticky;
+  top: 140px; /* below the sticky header */
+  align-self: start;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+}
+
+/* Cart itself stays normal */
+.sticky-cart {
+  position: static;
+}
+
+/* Mobile: stack everything */
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
@@ -666,6 +686,7 @@
     max-height: none;
     overflow: visible;
   }
+}
   /* ===== STICKY HEADER ===== */
 .sticky-header {
   position: sticky;
