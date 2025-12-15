@@ -666,11 +666,21 @@
     max-height: none;
     overflow: visible;
   }
+  /* ===== STICKY HEADER ===== */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--bg-color);
+  padding-top: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--input-border);
+}
 }
   </style>
 </head>
 <body class="dark">
-
+<header class="sticky-header">
   <div class="top-bar">
     <h1>Inventory Search by JAY</h1>
     <button id="themeToggle" class="theme-toggle">Switch to Light Mode</button>
@@ -691,6 +701,7 @@
     >
     <button id="searchButton">Search</button>
   </div>
+</header>
 
  <div class="layout">
 
