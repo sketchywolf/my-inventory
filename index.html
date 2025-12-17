@@ -361,38 +361,39 @@
       transform: translateY(10px);
       animation: fadeIn 0.35s forwards;
     }
-
-    /* Neon animated border */
-    .result-card::after{
-      content:"";
-      position:absolute;
-      inset: -2px;
-      background: conic-gradient(from 0deg,
-        rgba(37,246,255,.0),
-        rgba(37,246,255,.55),
-        rgba(255,43,214,.55),
-        rgba(155,92,255,.55),
-        rgba(37,246,255,.0)
-      );
-      filter: blur(10px);
-      opacity: .22;
-      animation: neonBorder 4.5s linear infinite;
-      z-index: 0;
-    }
-    .result-card::before{
-      content:"";
-      position:absolute;
-      inset: 1px;
-      background: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.12));
-      border-radius: calc(var(--radius) - 2px);
-      z-index: 0;
-    }
-    .result-card > *{ position: relative; z-index: 1; }
-
-    @keyframes neonBorder{
-      0%{ transform: rotate(0deg); }
-      100%{ transform: rotate(360deg); }
-    }
+    
+.result-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border-radius: var(--radius);
+  padding: 16px 16px 16px 22px; /* space for strip */
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.35s forwards;
+  border: 1px solid var(--border);
+}
+    /* Neon strip */
+.result-card::before{
+  content:"";
+  position:absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(
+    180deg,
+    var(--neon-cyan),
+    var(--neon-pink),
+    var(--neon-purple)
+  );
+  box-shadow:
+    0 0 10px rgba(37,246,255,.55),
+    0 0 18px rgba(255,43,214,.35);
+}
 
     /* Hover “glitch” effect for cards */
     .result-card:hover{
