@@ -93,7 +93,34 @@
     }
 
     header, main, aside, section { position: relative; z-index: 1; }
+    
+    /* Make native form controls follow the theme (helps select dropdowns a lot) */
+body.dark { color-scheme: dark; }
+body.light { color-scheme: light; }
 
+/* --- Admin category dropdown readability --- */
+body.dark #prodCategory{
+  background: linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92));
+  color: var(--text);
+  border: 1px solid rgba(37,246,255,.25);
+}
+
+/* Dropdown list items (works in Chrome/Edge; some browsers are limited) */
+body.dark #prodCategory option{
+  background: #0b0f1a;
+  color: #e9f7ff;
+}
+
+body.light #prodCategory{
+  background: rgba(255,255,255,.9);
+  color: #0c1120;
+  border: 1px solid rgba(20,40,60,.18);
+}
+
+body.light #prodCategory option{
+  background: #ffffff;
+  color: #0c1120;
+}
     /* ========== STICKY HEADER ========== */
     .sticky-header{
       position: sticky;
