@@ -646,11 +646,12 @@
       gap: 10px;
       flex-wrap: wrap;
       margin-bottom: 10px;
+    }
 
       /* Animated neon frame (reusable) */
 .neon-frame{
   border: 1px solid transparent;
-  border-radius: 14px;
+ border-radius: var(--radius);
 
   background:
     linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
@@ -679,7 +680,6 @@
     0 0 26px rgba(255,43,214,.2),
     0 12px 36px rgba(0,0,0,.6);
 }
-    }
 
     .cart-count{
       font-size: 13px;
