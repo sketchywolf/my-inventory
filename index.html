@@ -225,6 +225,7 @@
     .suggestion-form textarea,
     .admin-login-form input,
     .admin-product-form input,
+    .admin-product-form select,
     .admin-product-form textarea{
       padding: 10px 12px;
       font-size: 15px;
@@ -1164,7 +1165,9 @@
           <input type="text" id="prodBrand" placeholder="Brand (e.g. DVDO)" />
           <input type="text" id="prodModel" placeholder="Model (required)" required />
           <input type="text" id="prodName" placeholder="Product name / title" />
-          <input type="text" id="prodCategory" placeholder="Category (e.g. camera, converter, accessory)" />
+         <select id="prodCategory" required>
+  <!-- options are injected by JS -->
+</select>
           <input type="text" id="prodImage" placeholder="Image URL (optional)" />
           <textarea id="prodDescription" placeholder="Description"></textarea>
           <textarea id="prodSpecs" placeholder="Specs (one per line, e.g. Resolution: 1080p)"></textarea>
@@ -1892,7 +1895,7 @@
       const brand = prodBrandInput.value.trim();
       const model = prodModelInput.value.trim();
       const name = prodNameInput.value.trim();
-      let category = prodCategoryInput.value.trim().toLowerCase();
+      let category = document.getElementById("prodCategory").value.trim().toLowerCase();
       const image = prodImageInput.value.trim();
       const description = prodDescriptionInput.value.trim();
       const specsText = prodSpecsInput.value.trim();
@@ -1943,7 +1946,7 @@
       prodBrandInput.value = p.brand || "";
       prodModelInput.value = p.model || "";
       prodNameInput.value = p.name || "";
-      prodCategoryInput.value = p.category || "";
+      renderAdminCategoryDropdown(p.category || "");
       prodImageInput.value = p.image || "";
       prodDescriptionInput.value = p.description || "";
       prodSpecsInput.value = specsToText(p.specs);
@@ -2020,13 +2023,86 @@
       if(stored === "true") isAdmin = true;
       updateAdminUI();
     }
+    const CATEGORIES_STORAGE_KEY = "inventoryCategories";
+let categories = [];
+
+function loadCategories(){
+  try{
+    const raw = localStorage.getItem(CATEGORIES_STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed)) categories = parsed;
+    }
+  }catch(e){}
+
+  // If none saved yet, build from products + defaults
+  if(!categories.length){
+    const fromProducts = products
+      .map(p => (p.category || "").trim().toLowerCase())
+      .filter(Boolean);
+
+    categories = Array.from(new Set(["camera","converter","accessory", ...fromProducts])).sort();
+    saveCategories();
+  }
+}
+
+function saveCategories(){
+  localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(categories));
+}
+
+function renderAdminCategoryDropdown(selectedValue = ""){
+  const select = document.getElementById("prodCategory");
+  if(!select) return;
+
+  const selected = (selectedValue || "").trim().toLowerCase();
+
+  select.innerHTML = `
+    <option value="" disabled ${selected ? "" : "selected"}>Select category</option>
+    ${categories.map(c => `
+      <option value="${c}" ${c === selected ? "selected" : ""}>
+        ${formatCategoryLabel(c)}
+      </option>
+    `).join("")}
+    <option value="__add_new__">+ Add new category...</option>
+  `;
+}
+
+// When user chooses "+ Add new category..."
+document.getElementById("prodCategory").addEventListener("change", (e)=>{
+  if(e.target.value === "__add_new__"){
+    let newCat = prompt("Enter new category name (e.g. switcher, mic, tripod):", "");
+    if(!newCat){
+      renderAdminCategoryDropdown(); // reset
+      return;
+    }
+    newCat = newCat.trim().toLowerCase();
+    if(!newCat){
+      renderAdminCategoryDropdown();
+      return;
+    }
+
+    if(!categories.includes(newCat)){
+      categories.push(newCat);
+      categories.sort();
+      saveCategories();
+    }
+
+    // refresh both dropdowns
+    renderAdminCategoryDropdown(newCat);
+    renderCategoryOptions();
+    searchProduct();
+  }
+});
 
     /* ---------- INIT ---------- */
-    loadProducts();
-    renderCategoryOptions();   // ✅ populate categories on load
-    loadSuggestions();
-    initAdmin();
-    searchProduct();
+  loadProducts();
+  loadCategories();
+  renderCategoryOptions();
+  renderAdminCategoryDropdown();
+  loadSuggestions();
+  initAdmin();
+  searchProduct();
+
 
     window.toggleCompare = toggleCompare;
     window.clearCompare = clearCompare;
