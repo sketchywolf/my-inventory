@@ -279,20 +279,6 @@
       box-shadow: var(--shadow), var(--glow-cyan), var(--glow-pink);
     }
 
-    /* Make these buttons participate in pulse effect */
-    .search-box button,
-    .suggestion-form button,
-    .admin-login-form button,
-    .admin-product-form button,
-    .theme-toggle{
-      /* hook for pulse */
-    }
-    .search-box button,
-    .suggestion-form button,
-    .admin-login-form button,
-    .admin-product-form button{
-      /* apply pulse via class with JS (auto) OR keep via selector: */
-    }
     .search-box button::after,
     .suggestion-form button::after,
     .admin-login-form button::after,
@@ -348,63 +334,47 @@
     }
 
     /* ========== RESULT CARDS ========== */
-   .result-card{
-  border: 1px solid transparent;
-  border-radius: 14px;
+    .result-card{
+      border: 1px solid transparent;
+      border-radius: 14px;
 
-  background:
-    linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
-    linear-gradient(
-      135deg,
-      #25f6ff,
-      #ff2bd6,
-      #9b5cff,
-      #25f6ff
-    ) border-box;
+      background:
+        linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
+        linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
 
-  background-size: 100% 100%, 300% 300%;
-  animation: neonShift 10s linear infinite;
+      background-size: 100% 100%, 300% 300%;
 
-  padding: 16px;
-  margin-bottom: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
 
-  box-shadow:
-    0 0 0 1px rgba(37,246,255,.2),
-    0 10px 30px rgba(0,0,0,.55);
+      box-shadow:
+        0 0 0 1px rgba(37,246,255,.2),
+        0 10px 30px rgba(0,0,0,.55);
 
-  opacity: 0;
-  transform: translateY(10px);
-  animation:
-    fadeIn 0.35s forwards,
-    neonShift 10s linear infinite;
-}
-@keyframes neonShift {
-  0% {
-    background-position: 0% 50%, 0% 50%;
-  }
-  50% {
-    background-position: 0% 50%, 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%, 0% 50%;
-  }
-}
-    /*hovering speed*/
+      opacity: 0;
+      transform: translateY(10px);
+      animation:
+        fadeIn 0.35s forwards,
+        neonShift 10s linear infinite;
+    }
+
+    @keyframes neonShift {
+      0%   { background-position: 0% 50%, 0% 50%; }
+      50%  { background-position: 0% 50%, 100% 50%; }
+      100% { background-position: 0% 50%, 0% 50%; }
+    }
+
     .result-card:hover{
-  box-shadow:
-    0 0 0 1px rgba(37,246,255,.4),
-    0 0 20px rgba(37,246,255,.25),
-    0 0 26px rgba(255,43,214,.2),
-    0 12px 36px rgba(0,0,0,.6);
-  transform: translateY(-2px);
-}
-
-
-    /* Hover “glitch” effect for cards */
-    .result-card:hover{
+      box-shadow:
+        0 0 0 1px rgba(37,246,255,.4),
+        0 0 20px rgba(37,246,255,.25),
+        0 0 26px rgba(255,43,214,.2),
+        0 12px 36px rgba(0,0,0,.6);
       transform: translateY(-2px);
       transition: transform .12s ease;
     }
+
+    /* Hover “glitch” effect for cards */
     .result-card:hover .result-name{
       position: relative;
       animation: textGlitch 450ms steps(2,end) 1;
@@ -631,10 +601,10 @@
 
     /* ========== CART / QUOTATION (CARD LIST LAYOUT) ========== */
     #cartSection{
-  padding: 14px;
-  border-radius: var(--radius);
-  display: none; /* keep this */
-}
+      padding: 14px;
+      border-radius: var(--radius);
+      display: none; /* keep this */
+    }
 
     .cart-actions{
       display:flex;
@@ -645,31 +615,30 @@
       margin-bottom: 10px;
     }
 
-      /* Animated neon frame (reusable) */
-.neon-frame{
-  border: 1px solid transparent;
- border-radius: var(--radius);
+    /* Animated neon frame (reusable) */
+    .neon-frame{
+      border: 1px solid transparent;
+      border-radius: var(--radius);
 
-  background:
-    linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
-    linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
+      background:
+        linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
+        linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
 
-  background-size: 100% 100%, 300% 300%;
-  animation: neonShift 10s linear infinite;
+      background-size: 100% 100%, 300% 300%;
+      animation: neonShift 10s linear infinite;
 
-  box-shadow:
-    0 0 0 1px rgba(37,246,255,.2),
-    0 10px 30px rgba(0,0,0,.55);
-}
+      box-shadow:
+        0 0 0 1px rgba(37,246,255,.2),
+        0 10px 30px rgba(0,0,0,.55);
+    }
 
-/* Optional hover polish */
-.neon-frame:hover{
-  box-shadow:
-    0 0 0 1px rgba(37,246,255,.4),
-    0 0 20px rgba(37,246,255,.25),
-    0 0 26px rgba(255,43,214,.2),
-    0 12px 36px rgba(0,0,0,.6);
-}
+    .neon-frame:hover{
+      box-shadow:
+        0 0 0 1px rgba(37,246,255,.4),
+        0 0 20px rgba(37,246,255,.25),
+        0 0 26px rgba(255,43,214,.2),
+        0 12px 36px rgba(0,0,0,.6);
+    }
 
     .cart-count{
       font-size: 13px;
@@ -751,6 +720,10 @@
       z-index: 0;
     }
     .cart-item > *{ position: relative; z-index: 1; }
+
+    @keyframes neonBorder{
+      to{ transform: rotate(360deg); }
+    }
 
     .cart-top{
       display:flex;
@@ -1122,12 +1095,8 @@
     </div>
 
     <div class="search-box">
-      <select id="categorySelect">
-        <option value="all">All Categories</option>
-        <option value="camera">Cameras</option>
-        <option value="converter">Converters</option>
-        <option value="accessory">Accessories</option>
-      </select>
+      <!-- ✅ Option B: categories are generated by JS -->
+      <select id="categorySelect"></select>
 
       <input type="text" id="searchInput" placeholder="Enter model, product name or brand" />
       <button id="searchButton">Search</button>
@@ -1195,7 +1164,7 @@
           <input type="text" id="prodBrand" placeholder="Brand (e.g. DVDO)" />
           <input type="text" id="prodModel" placeholder="Model (required)" required />
           <input type="text" id="prodName" placeholder="Product name / title" />
-          <input type="text" id="prodCategory" placeholder="Category (camera, converter, accessory)" />
+          <input type="text" id="prodCategory" placeholder="Category (e.g. camera, converter, accessory)" />
           <input type="text" id="prodImage" placeholder="Image URL (optional)" />
           <textarea id="prodDescription" placeholder="Description"></textarea>
           <textarea id="prodSpecs" placeholder="Specs (one per line, e.g. Resolution: 1080p)"></textarea>
@@ -1392,6 +1361,36 @@
       localStorage.setItem(SUGGESTIONS_STORAGE_KEY, JSON.stringify(suggestions));
     }
 
+    /* ---------- ✅ OPTION B: DYNAMIC CATEGORY DROPDOWN ---------- */
+    function formatCategoryLabel(cat){
+      // "ptz-camera" -> "PTZ Camera", "usb_converter" -> "USB Converter"
+      return (cat || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[_-]+/g, " ")
+        .split(" ")
+        .filter(Boolean)
+        .map(w => (w.length <= 3 ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1)))
+        .join(" ");
+    }
+
+    function renderCategoryOptions(){
+      const categories = Array.from(
+        new Set(
+          products
+            .map(p => (p.category || "").trim().toLowerCase())
+            .filter(Boolean)
+        )
+      ).sort();
+
+      categorySelect.innerHTML = `
+        <option value="all">All Categories</option>
+        ${categories.map(c => `
+          <option value="${c}">${formatCategoryLabel(c)}</option>
+        `).join("")}
+      `;
+    }
+
     /* ---------- THEME TOGGLE ---------- */
     function applyTheme(theme){
       document.body.classList.remove("dark", "light");
@@ -1426,7 +1425,11 @@
           const name  = (p.name || "").toLowerCase();
           const brand = (p.brand || "").toLowerCase();
           const matchesText = !query || model.includes(query) || name.includes(query) || brand.includes(query);
-          const matchesCategory = (selectedCategory === "all") || (p.category === selectedCategory);
+
+          // ✅ robust category match
+          const pCat = (p.category || "").trim().toLowerCase();
+          const matchesCategory = (selectedCategory === "all") || (pCat === selectedCategory);
+
           return matchesText && matchesCategory;
         });
 
@@ -1799,15 +1802,15 @@
       const defaultName = (s.name || `${s.brand || ""} ${s.model || ""}`).trim();
       let category = prompt("Enter category for this product (camera / converter / accessory):", "converter");
       if(!category) category = "converter";
-      category = category.toLowerCase();
+      category = category.toLowerCase().trim();
 
       const image = prompt("Enter image URL for this product (optional):", "") || "";
       const specsText = prompt("Enter basic specs (optional, one per line as 'Key: Value'):", "");
       const specs = parseSpecsFromString(specsText);
 
       const newProduct = {
-        model: s.model || "",
-        brand: s.brand || "",
+        model: (s.model || "").trim(),
+        brand: (s.brand || "").trim(),
         name: defaultName || "New Product",
         category,
         description: s.notes || s.name || "",
@@ -1832,6 +1835,7 @@
       suggestions.splice(index, 1);
       saveSuggestions();
 
+      renderCategoryOptions();   // ✅ keep categories updated
       renderSuggestions();
       renderAdminProducts();
       searchProduct();
@@ -1924,9 +1928,10 @@
       editingProductIndex = null;
       productFormSubmitBtn.textContent = "Add product";
       productFormCancelEditBtn.style.display = "none";
+
+      renderCategoryOptions();   // ✅ keep categories updated
       renderAdminProducts();
       searchProduct();
-      renderCategoryOptions();
     });
 
     function startEditProduct(index){
@@ -1962,11 +1967,11 @@
       compareSelection = compareSelection.filter(m=>m !== model);
       cart = cart.filter(item=>item.model !== model);
 
+      renderCategoryOptions();   // ✅ keep categories updated
       renderAdminProducts();
       renderCart();
       renderCompare();
       searchProduct();
-      renderCategoryOptions();
     }
 
     function cancelProductEdit(){
@@ -2018,6 +2023,7 @@
 
     /* ---------- INIT ---------- */
     loadProducts();
+    renderCategoryOptions();   // ✅ populate categories on load
     loadSuggestions();
     initAdmin();
     searchProduct();
