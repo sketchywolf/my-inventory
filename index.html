@@ -646,6 +646,39 @@
       gap: 10px;
       flex-wrap: wrap;
       margin-bottom: 10px;
+
+      /* Animated neon frame (reusable) */
+.neon-frame{
+  border: 1px solid transparent;
+  border-radius: 14px;
+
+  background:
+    linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
+    linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
+
+  background-size: 100% 100%, 300% 300%;
+  animation: neonShift 10s linear infinite;
+
+  box-shadow:
+    0 0 0 1px rgba(37,246,255,.2),
+    0 10px 30px rgba(0,0,0,.55);
+}
+
+/* Animate the border gradient */
+@keyframes neonShift {
+  0%   { background-position: 0% 50%, 0% 50%; }
+  50%  { background-position: 0% 50%, 100% 50%; }
+  100% { background-position: 0% 50%, 0% 50%; }
+}
+
+/* Optional hover polish */
+.neon-frame:hover{
+  box-shadow:
+    0 0 0 1px rgba(37,246,255,.4),
+    0 0 20px rgba(37,246,255,.25),
+    0 0 26px rgba(255,43,214,.2),
+    0 12px 36px rgba(0,0,0,.6);
+}
     }
 
     .cart-count{
@@ -1129,7 +1162,7 @@
 
     <!-- RIGHT: STICKY CART -->
     <aside class="sidebar">
-      <section id="cartSection" class="sticky-cart">
+      <section id="cartSection" class="sticky-cart neon-frame">
         <div class="cart-actions">
           <span class="cart-count" id="cartCountText"></span>
           <button class="download-quote-btn" onclick="downloadQuotation()">
