@@ -348,53 +348,41 @@
     }
 
     /* ========== RESULT CARDS ========== */
-    .result-card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
-      margin-bottom: 12px;
-      position: relative;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeIn 0.35s forwards;
-    }
-    
-.result-card{
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-  border-radius: var(--radius);
-  padding: 16px 16px 16px 22px; /* space for strip */
-  box-shadow: var(--shadow);
+   .result-card{
+  /* needed for the border effect */
+  border: 1px solid transparent;
+  border-radius: 14px;
+
+  /* neon frame around the card */
+  background:
+    linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
+    linear-gradient(135deg,
+      rgba(37,246,255,.95),
+      rgba(255,43,214,.85),
+      rgba(155,92,255,.85),
+      rgba(37,246,255,.75)
+    ) border-box;
+
+  padding: 16px;
   margin-bottom: 12px;
-  position: relative;
-  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(37,246,255,.15),
+    0 10px 30px rgba(0,0,0,.55);
+  color: var(--text-color);
+
   opacity: 0;
   transform: translateY(10px);
   animation: fadeIn 0.35s forwards;
-  border: 1px solid var(--border);
-}
-    /* Neon strip */
-.result-card::before{
-  content:"";
-  position:absolute;
-  top: 10px;
-  bottom: 10px;
-  left: 0;
-  width: 4px;
-  border-radius: 0 4px 4px 0;
-  background: linear-gradient(
-    180deg,
-    var(--neon-cyan),
-    var(--neon-pink),
-    var(--neon-purple)
-  );
-  box-shadow:
-    0 0 10px rgba(37,246,255,.55),
-    0 0 18px rgba(255,43,214,.35);
 }
 
+.result-card:hover{
+  box-shadow:
+    0 0 0 1px rgba(37,246,255,.35),
+    0 0 18px rgba(37,246,255,.18),
+    0 0 22px rgba(255,43,214,.12),
+    0 12px 36px rgba(0,0,0,.6);
+  transform: translateY(-2px);
+}
     /* Hover “glitch” effect for cards */
     .result-card:hover{
       transform: translateY(-2px);
