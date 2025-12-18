@@ -1427,7 +1427,136 @@
         .replace(/-+/g, "-")
         .replace(/^-|-$/g, "");
     }
+    //Duplicate Detection
+    function normText(s){
+  return (s || "")
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
 
+function normModel(s){
+  return (s || "")
+    .toString()
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, "");
+}
+
+// Levenshtein distance (for "similar name" detection)
+function levenshtein(a, b){
+  a = normText(a);
+  b = normText(b);
+  if(a === b) return 0;
+  if(!a) return b.length;
+  if(!b) return a.length;
+
+  const m = a.length, n = b.length;
+  const dp = Array.from({length: m + 1}, ()=> Array(n + 1).fill(0));
+  for(let i=0;i<=m;i++) dp[i][0] = i;
+  for(let j=0;j<=n;j++) dp[0][j] = j;
+
+  for(let i=1;i<=m;i++){
+    for(let j=1;j<=n;j++){
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      dp[i][j] = Math.min(
+        dp[i-1][j] + 1,
+        dp[i][j-1] + 1,
+        dp[i-1][j-1] + cost
+      );
+    }
+  }
+  return dp[m][n];
+}
+
+function similarityScore(a, b){
+  a = normText(a);
+  b = normText(b);
+  if(!a && !b) return 1;
+  const dist = levenshtein(a, b);
+  const maxLen = Math.max(a.length, b.length) || 1;
+  return 1 - (dist / maxLen); // 0..1
+}
+
+function findDuplicateWarnings({ model, name, ignoreIndex = null }){
+  const targetModel = normModel(model);
+  const targetName  = normText(name);
+
+  const sameModelMatches = [];
+  const similarNameMatches = [];
+
+  products.forEach((p, idx)=>{
+    if(ignoreIndex !== null && idx === ignoreIndex) return;
+
+    const pModel = normModel(p.model);
+    const pName  = normText(p.name);
+
+    if(targetModel && pModel === targetModel){
+      sameModelMatches.push({ idx, p });
+    }
+
+    // Similar name check:
+    // - exact same normalized name
+    // - contains check (one includes the other, with length threshold)
+    // - similarity score >= threshold
+    if(targetName && pName){
+      const contains =
+        (pName.includes(targetName) && targetName.length >= 6) ||
+        (targetName.includes(pName) && pName.length >= 6);
+
+      const score = similarityScore(targetName, pName);
+      const close = score >= 0.82; // tweak if you want more/less strict
+
+      if(pName === targetName || contains || close){
+        // avoid listing the same item twice if it was already same-model
+        similarNameMatches.push({ idx, p, score });
+      }
+    }
+  });
+
+  // dedupe similarName list by model index
+  const seen = new Set();
+  const similarDeduped = [];
+  for(const item of similarNameMatches){
+    if(seen.has(item.idx)) continue;
+    seen.add(item.idx);
+    similarDeduped.push(item);
+  }
+
+  return { sameModelMatches, similarNameMatches: similarDeduped };
+}
+
+function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
+  const { sameModelMatches, similarNameMatches } = findDuplicateWarnings({ model, name, ignoreIndex });
+
+  if(!sameModelMatches.length && !similarNameMatches.length) return true;
+
+  let msg = "⚠️ Possible duplicates found:\n\n";
+
+  if(sameModelMatches.length){
+    msg += "Same MODEL exists:\n";
+    sameModelMatches.slice(0,5).forEach(x=>{
+      msg += `- ${x.p.model} • ${x.p.name || ""} (${x.p.brand || "-"})\n`;
+    });
+    if(sameModelMatches.length > 5) msg += `...and ${sameModelMatches.length - 5} more\n`;
+    msg += "\n";
+  }
+
+  if(similarNameMatches.length){
+    msg += "Similar NAME exists:\n";
+    similarNameMatches.slice(0,5).forEach(x=>{
+      const pct = Math.round((x.score ?? 0) * 100);
+      msg += `- ${x.p.name || ""} • ${x.p.model} (${x.p.brand || "-"}) [~${pct}%]\n`;
+    });
+    if(similarNameMatches.length > 5) msg += `...and ${similarNameMatches.length - 5} more\n`;
+    msg += "\n";
+  }
+
+  msg += "Continue saving anyway?";
+
+  return confirm(msg);
+}
     function findCategoryLabelById(id){
       const cat = categories.find(c => c.id === id);
       return cat ? cat.label : (id ? formatCategoryLabel(id) : "Uncategorized");
@@ -2239,62 +2368,70 @@
           ${rowsHtml}
         </table>`;
     }
+//duplicate detection 
+  productForm.addEventListener("submit", (event)=>{
+  event.preventDefault();
+  if(!isAdmin){ alert("Admin only."); return; }
 
-    productForm.addEventListener("submit", (event)=>{
-      event.preventDefault();
-      if(!isAdmin){ alert("Admin only."); return; }
+  const brand = prodBrandInput.value.trim();
+  const model = prodModelInput.value.trim();
+  const name = prodNameInput.value.trim();
+  let category = (prodCategoryInput.value || "").trim().toLowerCase();
+  const image = prodImageInput.value.trim();
+  const description = prodDescriptionInput.value.trim();
+  const specsText = prodSpecsInput.value.trim();
+  const specs = parseSpecsFromString(specsText);
 
-      const brand = prodBrandInput.value.trim();
-      const model = prodModelInput.value.trim();
-      const name = prodNameInput.value.trim();
-      let category = (prodCategoryInput.value || "").trim().toLowerCase();
-      const image = prodImageInput.value.trim();
-      const description = prodDescriptionInput.value.trim();
-      const specsText = prodSpecsInput.value.trim();
-      const specs = parseSpecsFromString(specsText);
+  if(!model){ alert("Model is required."); return; }
+  if(!category || category === "__add_new__") category = "uncategorized";
+  ensureCategoryExists(category);
 
-      if(!model){ alert("Model is required."); return; }
-      if(!category || category === "__add_new__") category = "uncategorized";
-      ensureCategoryExists(category);
+  const productData = {
+    model,
+    brand,
+    name: name || `${brand} ${model}`.trim() || "New Product",
+    category,
+    description,
+    image,
+    specs
+  };
 
-      const productData = {
-        model,
-        brand,
-        name: name || `${brand} ${model}`.trim() || "New Product",
-        category,
-        description,
-        image,
-        specs
-      };
+  // ✅ Duplicate detection (ignore the current row if editing)
+  const ok = showDuplicateWarningAndConfirm({
+    model: productData.model,
+    name: productData.name,
+    ignoreIndex: editingProductIndex !== null ? editingProductIndex : null
+  });
+  if(!ok) return;
 
-      if(editingProductIndex !== null){
-        products[editingProductIndex] = productData;
-      }else{
-        const existingIndex = products.findIndex(p=>p.model === model);
-        if(existingIndex !== -1){
-          if(!confirm("A product with this model already exists. Replace it?")) return;
-          products[existingIndex] = productData;
-        }else{
-          products.push(productData);
-        }
-      }
+  if(editingProductIndex !== null){
+    products[editingProductIndex] = productData;
+  }else{
+    // still keep your existing "replace exact model" behavior
+    const existingIndex = products.findIndex(p => normModel(p.model) === normModel(model));
+    if(existingIndex !== -1){
+      if(!confirm("A product with this model already exists. Replace it?")) return;
+      products[existingIndex] = productData;
+    }else{
+      products.push(productData);
+    }
+  }
 
-      saveProducts();
-      syncProductsCategoryIds();
-      saveCategories();
+  saveProducts();
+  syncProductsCategoryIds();
+  saveCategories();
 
-      productForm.reset();
-      editingProductIndex = null;
-      productFormSubmitBtn.textContent = "Add product";
-      productFormCancelEditBtn.style.display = "none";
+  productForm.reset();
+  editingProductIndex = null;
+  productFormSubmitBtn.textContent = "Add product";
+  productFormCancelEditBtn.style.display = "none";
 
-      renderTopCategoryDropdown();
-      renderAdminCategoryDropdown();
-      renderCategoryManager();
-      renderAdminProducts();
-      searchProduct();
-    });
-
+  renderTopCategoryDropdown();
+  renderAdminCategoryDropdown();
+  renderCategoryManager();
+  renderAdminProducts();
+  searchProduct();
+});
     function startEditProduct(index){
       if(!isAdmin) return;
       const p = products[index];
