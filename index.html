@@ -805,21 +805,28 @@
     /***********************
      * BACKEND (Google Apps Script)
      ***********************/
-    const API_BASE = "https://script.google.com/macros/s/AKfycbzGVGW8EZ8R8Mi3gcXYJ7H6aJHtaK99CFkRK9Wp7q0nc8Z4FjnaD9DehlX51vMAEKcuSQ/exec";
+   const API_BASE = "https://script.google.com/macros/s/AKfycbzGVGW8EZ8R8Mi3gcXYJ7H6aJHtaK99CFkRK9Wp7q0nc8Z4FjnaD9DehlX51vMAEKcuSQ/exec";
 
-    async function apiGet(path){
-      const res = await fetch(`${API_BASE}?path=${encodeURIComponent(path)}`, { method:"GET" });
-      return await res.json();
-    }
-    async function apiPost(payload){
-      const res = await fetch(API_BASE, {
-        method: "POST",
-        headers: { "Content-Type":"application/json" },
-        body: JSON.stringify(payload)
-      });
-      return await res.json();
-    }
+async function apiGet(paramsObj){
+  const qs = new URLSearchParams(paramsObj).toString();
+  const res = await fetch(`${API_BASE}?${qs}`, { method:"GET", cache:"no-store" });
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch { return { ok:false, error:"Non-JSON response from Web App", raw:text }; }
+}
 
+async function apiPostForm(paramsObj){
+  const body = new URLSearchParams(paramsObj);
+  const res = await fetch(API_BASE, {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type":"application/x-www-form-urlencoded;charset=UTF-8" },
+    body
+  });
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch { return { ok:false, error:"Non-JSON response from Web App", raw:text }; }
+}
     /* ---------- DATA ---------- */
     const DEFAULT_PRODUCTS = [
       {
@@ -964,31 +971,49 @@
     });
 
     /* ---------- BACKEND LOADERS ---------- */
-    async function loadProducts(){
-      try{
-        const out = await apiGet("products");
-        if(out.ok && Array.isArray(out.data)){
-          products = out.data;
-          return;
-        }
-      }catch(e){}
-      products = DEFAULT_PRODUCTS.slice();
-    }
+   async function loadProducts(){
+  // try common pattern: action=get_products
+  let out = await apiGet({ action: "get_products" });
+  if(out && out.ok && Array.isArray(out.data)) { products = out.data; return; }
 
-    async function loadCategories(){
-      try{
-        const out = await apiGet("categories");
-        if(out.ok && Array.isArray(out.data)){
-          // store as plain category list
-          categories = out.data.map(x => (x.category || "").toLowerCase().trim()).filter(Boolean);
-          // fall back defaults if blank
-          if(!categories.length) categories = ["camera","converter","accessory"];
-          return;
-        }
-      }catch(e){}
-      categories = ["camera","converter","accessory"];
-    }
+  // fallback: path=products (if your script uses that)
+  out = await apiGet({ path: "products" });
+  if(out && out.ok && Array.isArray(out.data)) { products = out.data; return; }
 
+  products = DEFAULT_PRODUCTS.slice();
+}
+
+async function loadCategories(){
+  let out = await apiGet({ action: "get_categories" });
+  if(out && out.ok && Array.isArray(out.data)) {
+    categories = out.data.map(x => (x.category || "").toLowerCase().trim()).filter(Boolean);
+    if(!categories.length) categories = ["camera","converter","accessory"];
+    return;
+  }
+
+  out = await apiGet({ path: "categories" });
+  if(out && out.ok && Array.isArray(out.data)) {
+    categories = out.data.map(x => (x.category || "").toLowerCase().trim()).filter(Boolean);
+    if(!categories.length) categories = ["camera","converter","accessory"];
+    return;
+  }
+
+  categories = ["camera","converter","accessory"];
+}
+    //post form
+    async function saveProductToBackend(productData){
+  // common Apps Script: action=upsert_product, product=JSON-string
+  return await apiPostForm({ action:"upsert_product", product: JSON.stringify(productData) });
+}
+
+async function deleteProductInBackend(model){
+  return await apiPostForm({ action:"delete_product", model });
+}
+
+async function saveCategoryToBackend(cat){
+  return await apiPostForm({ action:"upsert_category", category: JSON.stringify(cat) });
+}
+    
     /* ---------- CATEGORY RENDER ---------- */
     function renderCategoryOptions(){
       const cats = Array.from(new Set(categories)).sort();
@@ -1027,7 +1052,7 @@
       }
 
       // upsert to backend
-      const out = await apiPost({ action:"upsert_category", category: { category: newCat, label: formatCategoryLabel(newCat) }});
+      const out = await saveCategoryToBackend({ ... });
       if(!out.ok){
         alert("Failed to add category: " + (out.error || "Unknown error"));
         renderAdminCategoryDropdown();
@@ -1241,34 +1266,56 @@
       const totalItems = cart.reduce((sum, item)=>sum + item.quantity, 0);
       cartCountText.textContent = `Cart: ${cart.length} product(s), ${totalItems} item(s) total.`;
 
-      cartContainer.innerHTML = `
-        <div class="cart-list">
-          ${cart.map(item=>`
-            <div class="cart-item">
-              <div class="cart-top">
-                <div class="cart-title">
-                  <div class="brand">${item.brand || "-"}</div>
-                  <div class="model">${item.model}</div>
-                </div>
-              </div>
-
-              <div class="cart-desc">${item.description || ""}</div>
-
-              <div class="cart-controls">
-                <div class="qty-wrap">
-                  <span>Qty</span>
-                  <input type="number" min="1" value="${item.quantity}"
-                    onchange="updateCartQuantity('${item.model}', this.value)" />
-                </div>
-
-                <button class="remove-cart-btn" onclick="removeFromCart('${item.model}')">Remove</button>
-              </div>
-            </div>
-          `).join("")}
+    cartContainer.innerHTML = `
+  ${renderQuoteMetaForm()}
+  <div class="cart-list">
+    ${cart.map(item=>`
+      <div class="cart-item">
+        <div class="cart-top">
+          <div class="cart-title">
+            <div class="brand">${item.brand || "-"}</div>
+            <div class="model">${item.model}</div>
+          </div>
         </div>
-      `;
-    }
 
+        <div class="cart-desc">${item.description || ""}</div>
+
+        <div class="cart-controls">
+          <div class="qty-wrap">
+            <span>Qty</span>
+            <input type="number" min="1" value="${item.quantity}"
+              onchange="updateCartQuantity('${item.model}', this.value)" />
+          </div>
+
+          <button class="remove-cart-btn" onclick="removeFromCart('${item.model}')">
+            Remove
+          </button>
+        </div>
+      </div>
+    `).join("")}
+  </div>
+`;
+//product qoutation
+hookQuoteMetaInputs();
+      const metaRows = [
+  ["ESTIMATED WORKSHEET"],
+  [],
+  ["CLIENT", quoteMeta.client],
+  ["Location", quoteMeta.location],
+  ["Date Today", quoteMeta.dateToday],
+  ["CONTACT", quoteMeta.contact],
+  ["Phone/Fax-Email", quoteMeta.phoneEmail],
+  ["Project/Type/Name", quoteMeta.projectName],
+  ["Account Executive", quoteMeta.accountExecutive],
+  ["AV Design Engineer", quoteMeta.avEngineer],
+  ["EWS Control No.", quoteMeta.ewsControlNo],
+  ["Notes", quoteMeta.notes],
+  [],
+];
+
+metaRows.forEach(r => rows.push(r.map(csvEscape)));
+rows.push([]);
+      
     function downloadQuotation(){
       if(cart.length === 0){
         alert("Cart is empty. Add products before generating a quotation.");
@@ -1299,6 +1346,76 @@
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     }
+    //(Client/Project/etc) + include in export
+    const QUOTE_META_KEY = "inventoryQuoteMeta";
+let quoteMeta = {
+  client: "",
+  location: "",
+  contact: "",
+  phoneEmail: "",
+  projectName: "",
+  accountExecutive: "",
+  avEngineer: "",
+  ewsControlNo: "",
+  dateToday: new Date().toISOString().slice(0,10),
+  notes: ""
+};
+
+function loadQuoteMeta(){
+  try{
+    const raw = localStorage.getItem(QUOTE_META_KEY);
+    if(raw) quoteMeta = { ...quoteMeta, ...JSON.parse(raw) };
+  }catch(e){}
+}
+
+function saveQuoteMeta(){
+  localStorage.setItem(QUOTE_META_KEY, JSON.stringify(quoteMeta));
+}
+
+function renderQuoteMetaForm(){
+  // inject ABOVE cart list (inside cartContainer)
+  const formHtml = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+      <input id="qm_client" placeholder="Client" value="${quoteMeta.client || ""}">
+      <input id="qm_location" placeholder="Location" value="${quoteMeta.location || ""}">
+      <input id="qm_contact" placeholder="Contact" value="${quoteMeta.contact || ""}">
+      <input id="qm_phoneEmail" placeholder="Phone/Fax-Email" value="${quoteMeta.phoneEmail || ""}">
+      <input id="qm_projectName" placeholder="Project/Type/Name" value="${quoteMeta.projectName || ""}">
+      <input id="qm_accountExecutive" placeholder="Account Executive" value="${quoteMeta.accountExecutive || ""}">
+      <input id="qm_avEngineer" placeholder="AV Design Engineer" value="${quoteMeta.avEngineer || ""}">
+      <input id="qm_ewsControlNo" placeholder="EWS Control No." value="${quoteMeta.ewsControlNo || ""}">
+      <input id="qm_dateToday" type="date" value="${quoteMeta.dateToday || ""}">
+      <div></div>
+      <textarea id="qm_notes" placeholder="Notes (optional)" style="grid-column:1/-1; min-height:70px;">${quoteMeta.notes || ""}</textarea>
+    </div>
+  `;
+
+  return formHtml;
+}
+
+function hookQuoteMetaInputs(){
+  const map = [
+    ["qm_client","client"],
+    ["qm_location","location"],
+    ["qm_contact","contact"],
+    ["qm_phoneEmail","phoneEmail"],
+    ["qm_projectName","projectName"],
+    ["qm_accountExecutive","accountExecutive"],
+    ["qm_avEngineer","avEngineer"],
+    ["qm_ewsControlNo","ewsControlNo"],
+    ["qm_dateToday","dateToday"],
+    ["qm_notes","notes"]
+  ];
+
+  map.forEach(([id,key])=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener("input", ()=>{
+      quoteMeta[key] = el.value;
+      saveQuoteMeta();
+    });
+  });
+}
 
     /* ---------- SUGGESTIONS (still local) ---------- */
     function loadSuggestions(){
@@ -1563,7 +1680,7 @@
       }
 
       // Save to backend
-      const out = await apiPost({ action:"upsert_product", product: productData });
+      const out = await saveProductToBackend(productData);
       if(!out.ok){
         alert("Failed to save product: " + (out.error || "Unknown error"));
         return;
@@ -1610,7 +1727,7 @@
       if(!p) return;
       if(!confirm(`Delete product ${p.model}?`)) return;
 
-      const out = await apiPost({ action:"delete_product", model: p.model });
+      const out = await deleteProductInBackend(model);
       if(!out.ok){
         alert("Failed to delete: " + (out.error || "Unknown error"));
         return;
@@ -1695,6 +1812,9 @@
 
       // initial search
       searchProduct();
+
+      //loadquote
+      loadQuoteMeta();
     })();
 
     // expose for inline onclick
