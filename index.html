@@ -28,12 +28,6 @@
       --glow-purple: 0 0 14px rgba(155,92,255,.35);
 
       --radius: 14px;
-
-      /* dropdown menu colors (dark) */
-      --select-bg: rgba(12,16,26,.96);
-      --select-border: rgba(37,246,255,.30);
-      --option-bg: #0b0f1a;
-      --option-color: #e9f7ff;
     }
 
     /* Light mode (still cyber) */
@@ -51,12 +45,6 @@
       --glow-cyan: 0 0 12px rgba(37,246,255,.25);
       --glow-pink: 0 0 12px rgba(255,43,214,.18);
       --glow-purple: 0 0 12px rgba(155,92,255,.20);
-
-      /* dropdown menu colors (light) */
-      --select-bg: rgba(255,255,255,.95);
-      --select-border: rgba(20,40,60,.18);
-      --option-bg: #ffffff;
-      --option-color: #0c1120;
     }
 
     * { box-sizing: border-box; }
@@ -109,18 +97,33 @@
     body.dark { color-scheme: dark; }
     body.light { color-scheme: light; }
 
-    /* ✅ Make dropdown list readable in dark mode (and consistent in light mode) */
-    select{
-      background: var(--select-bg) !important;
-      color: var(--text) !important;
-      border: 1px solid var(--select-border) !important;
+    /* Better dropdown readability in dark mode (including opened list on many browsers) */
+    body.dark select{
+      background: linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92));
+      color: #e9f7ff;
+      border: 1px solid rgba(37,246,255,.35);
+      box-shadow: 0 0 0 1px rgba(37,246,255,.10), 0 10px 30px rgba(0,0,0,.35);
       appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
     }
-    select option{
-      background: var(--option-bg) !important;
-      color: var(--option-color) !important;
+    body.dark select:focus{
+      outline: none;
+      border-color: rgba(37,246,255,.70);
+      box-shadow: 0 0 0 3px rgba(37,246,255,.18), 0 10px 30px rgba(0,0,0,.45);
+    }
+    body.dark select option{
+      background: #0b0f1a;
+      color: #e9f7ff;
+    }
+
+    body.light select{
+      background: rgba(255,255,255,.92);
+      color: #0c1120;
+      border: 1px solid rgba(20,40,60,.18);
+      appearance: none;
+    }
+    body.light select option{
+      background: #ffffff;
+      color: #0c1120;
     }
 
     /* ========== STICKY HEADER ========== */
@@ -211,9 +214,7 @@
       overflow: hidden;
     }
 
-    /* ========== SOUNDLESS PULSE (buttons) ========== */
-    .theme-toggle::after,
-    .btn-pulse::after{
+    .theme-toggle::after{
       content:"";
       position:absolute;
       inset: -30px;
@@ -223,8 +224,7 @@
       transition: opacity .2s ease;
       pointer-events:none;
     }
-    .theme-toggle:hover::after,
-    .btn-pulse:hover::after{
+    .theme-toggle:hover::after{
       opacity: 1;
       animation: pulse 900ms ease-out infinite;
     }
@@ -255,7 +255,9 @@
     .admin-login-form input,
     .admin-product-form input,
     .admin-product-form select,
-    .admin-product-form textarea{
+    .admin-product-form textarea,
+    .quote-meta input,
+    .quote-meta textarea{
       padding: 10px 12px;
       font-size: 15px;
       border-radius: 12px;
@@ -272,20 +274,23 @@
     .suggestion-form textarea::placeholder,
     .admin-login-form input::placeholder,
     .admin-product-form input::placeholder,
-    .admin-product-form textarea::placeholder{
+    .admin-product-form textarea::placeholder,
+    .quote-meta input::placeholder,
+    .quote-meta textarea::placeholder{
       color: rgba(233,247,255,.45);
     }
 
     .search-box input{ flex: 1 1 260px; }
     .search-box select{
-      flex: 0 0 230px;
+      flex: 0 0 210px;
       cursor: pointer;
     }
 
     .search-box button,
     .suggestion-form button,
     .admin-login-form button,
-    .admin-product-form button{
+    .admin-product-form button,
+    .category-manager button{
       padding: 10px 16px;
       font-size: 15px;
       cursor: pointer;
@@ -303,31 +308,11 @@
     .search-box button:hover,
     .suggestion-form button:hover,
     .admin-login-form button:hover,
-    .admin-product-form button:hover{
+    .admin-product-form button:hover,
+    .category-manager button:hover{
       transform: translateY(-1px);
       filter: brightness(1.06);
       box-shadow: var(--shadow), var(--glow-cyan), var(--glow-pink);
-    }
-
-    .search-box button::after,
-    .suggestion-form button::after,
-    .admin-login-form button::after,
-    .admin-product-form button::after{
-      content:"";
-      position:absolute;
-      inset:-30px;
-      background: radial-gradient(closest-side, rgba(37,246,255,.18), transparent 60%);
-      opacity: 0;
-      transform: scale(.7);
-      transition: opacity .2s ease;
-      pointer-events:none;
-    }
-    .search-box button:hover::after,
-    .suggestion-form button:hover::after,
-    .admin-login-form button:hover::after,
-    .admin-product-form button:hover::after{
-      opacity: 1;
-      animation: pulse 900ms ease-out infinite;
     }
 
     /* ========== MAIN LAYOUT ========== */
@@ -373,7 +358,6 @@
         linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
 
       background-size: 100% 100%, 300% 300%;
-
       padding: 16px;
       margin-bottom: 12px;
 
@@ -383,9 +367,7 @@
 
       opacity: 0;
       transform: translateY(10px);
-      animation:
-        fadeIn 0.35s forwards,
-        neonShift 10s linear infinite;
+      animation: fadeIn 0.35s forwards, neonShift 10s linear infinite;
     }
 
     @keyframes neonShift {
@@ -402,18 +384,6 @@
         0 12px 36px rgba(0,0,0,.6);
       transform: translateY(-2px);
       transition: transform .12s ease;
-    }
-
-    .result-card:hover .result-name{
-      position: relative;
-      animation: textGlitch 450ms steps(2,end) 1;
-    }
-    @keyframes textGlitch{
-      0%{ transform: translate(0,0); }
-      25%{ transform: translate(1px,-1px); }
-      50%{ transform: translate(-1px,1px); }
-      75%{ transform: translate(2px,0); }
-      100%{ transform: translate(0,0); }
     }
 
     .result-header{
@@ -459,7 +429,7 @@
 
     .result-description{
       margin: 10px 0 0;
-      color: rgba(233,247,255,.82);
+      color: rgba(233,247,255,.88);
       line-height: 1.45;
     }
 
@@ -486,7 +456,7 @@
       gap: 6px;
       cursor:pointer;
       user-select:none;
-      color: rgba(233,247,255,.85);
+      color: rgba(233,247,255,.90);
     }
 
     .add-cart-btn{
@@ -507,22 +477,10 @@
       transform: translateY(-1px);
       filter: brightness(1.06);
     }
-    .add-cart-btn::after{
-      content:"";
-      position:absolute;
-      inset:-30px;
-      background: radial-gradient(closest-side, rgba(255,43,214,.22), transparent 60%);
-      opacity: 0;
-      transform: scale(.7);
-      pointer-events:none;
-      transition: opacity .2s ease;
-    }
-    .add-cart-btn:hover::after{
-      opacity: 1;
-      animation: pulse 900ms ease-out infinite;
-    }
 
-    @keyframes fadeIn{ to{ opacity:1; transform: translateY(0); } }
+    @keyframes fadeIn{
+      to{ opacity:1; transform: translateY(0); }
+    }
 
     /* ========== LOADER / NO RESULT ========== */
     .loader{
@@ -583,20 +541,6 @@
       position: relative;
       overflow:hidden;
     }
-    .clear-compare-btn::after{
-      content:"";
-      position:absolute;
-      inset:-30px;
-      background: radial-gradient(closest-side, rgba(37,246,255,.18), transparent 60%);
-      opacity: 0;
-      transform: scale(.7);
-      pointer-events:none;
-      transition: opacity .2s ease;
-    }
-    .clear-compare-btn:hover::after{
-      opacity: 1;
-      animation: pulse 900ms ease-out infinite;
-    }
 
     .compare-table{
       width: 100%;
@@ -633,6 +577,19 @@
       display: none;
     }
 
+    .neon-frame{
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
+        linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
+      background-size: 100% 100%, 300% 300%;
+      animation: neonShift 10s linear infinite;
+      box-shadow:
+        0 0 0 1px rgba(37,246,255,.2),
+        0 10px 30px rgba(0,0,0,.55);
+    }
+
     .cart-actions{
       display:flex;
       justify-content: space-between;
@@ -642,31 +599,10 @@
       margin-bottom: 10px;
     }
 
-    .neon-frame{
-      border: 1px solid transparent;
-      border-radius: var(--radius);
-
-      background:
-        linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
-        linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
-
-      background-size: 100% 100%, 300% 300%;
-      animation: neonShift 10s linear infinite;
-
-      box-shadow:
-        0 0 0 1px rgba(37,246,255,.2),
-        0 10px 30px rgba(0,0,0,.55);
+    .cart-count{
+      font-size: 13px;
+      color: var(--muted);
     }
-
-    .neon-frame:hover{
-      box-shadow:
-        0 0 0 1px rgba(37,246,255,.4),
-        0 0 20px rgba(37,246,255,.25),
-        0 0 26px rgba(255,43,214,.2),
-        0 12px 36px rgba(0,0,0,.6);
-    }
-
-    .cart-count{ font-size: 13px; color: var(--muted); }
 
     .download-quote-btn{
       padding: 10px 14px;
@@ -682,20 +618,50 @@
       position: relative;
       overflow:hidden;
     }
-    .download-quote-btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
-    .download-quote-btn::after{
-      content:"";
-      position:absolute;
-      inset:-30px;
-      background: radial-gradient(closest-side, rgba(49,255,139,.18), transparent 60%);
-      opacity: 0;
-      transform: scale(.7);
-      pointer-events:none;
-      transition: opacity .2s ease;
+    .download-quote-btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.06);
     }
-    .download-quote-btn:hover::after{ opacity: 1; animation: pulse 900ms ease-out infinite; }
 
-    .cart-list{ display:flex; flex-direction: column; gap: 10px; }
+    .quote-meta{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0 12px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.10));
+    }
+    .quote-meta textarea{
+      grid-column: 1 / -1;
+      min-height: 70px;
+      resize: vertical;
+    }
+    .quote-meta .full{
+      grid-column: 1 / -1;
+    }
+/* ✅ Fix cart meta fields overflowing the cart border (CSS grid min-width issue) */
+.quote-meta > *{
+  min-width: 0;       /* allow grid items to shrink */
+  max-width: 100%;
+}
+
+.quote-meta input,
+.quote-meta textarea{
+  width: 100%;
+  min-width: 0;
+}
+
+#cartSection{
+  overflow: hidden;   /* prevents any glow/border from spilling outside */
+}
+
+    .cart-list{
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
     .cart-item{
       border-radius: 14px;
@@ -706,33 +672,6 @@
       position: relative;
       overflow: hidden;
     }
-
-    .cart-item::after{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background: conic-gradient(from 0deg,
-        rgba(255,43,214,.0),
-        rgba(255,43,214,.55),
-        rgba(37,246,255,.55),
-        rgba(155,92,255,.55),
-        rgba(255,43,214,.0)
-      );
-      filter: blur(12px);
-      opacity: .18;
-      animation: neonBorder 5.2s linear infinite;
-      z-index: 0;
-    }
-    .cart-item::before{
-      content:"";
-      position:absolute;
-      inset: 1px;
-      background: linear-gradient(180deg, rgba(0,0,0,.24), rgba(0,0,0,.12));
-      border-radius: 12px;
-      z-index: 0;
-    }
-    .cart-item > *{ position: relative; z-index: 1; }
-    @keyframes neonBorder{ to{ transform: rotate(360deg); } }
 
     .cart-top{
       display:flex;
@@ -765,7 +704,7 @@
 
     .cart-desc{
       font-size: 13px;
-      color: rgba(233,247,255,.86);
+      color: rgba(233,247,255,.90);
       line-height: 1.45;
       margin: 6px 0 10px;
       word-break: break-word;
@@ -811,18 +750,10 @@
       position: relative;
       overflow:hidden;
     }
-    .remove-cart-btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
-    .remove-cart-btn::after{
-      content:"";
-      position:absolute;
-      inset:-30px;
-      background: radial-gradient(closest-side, rgba(255,43,214,.18), transparent 60%);
-      opacity: 0;
-      transform: scale(.7);
-      pointer-events:none;
-      transition: opacity .2s ease;
+    .remove-cart-btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.06);
     }
-    .remove-cart-btn:hover::after{ opacity: 1; animation: pulse 900ms ease-out infinite; }
 
     /* ========== ADMIN + SUGGESTION PANELS ========== */
     #adminSection, #suggestionSection{
@@ -877,17 +808,6 @@
       overflow:hidden;
     }
     .admin-btn:hover{ filter: brightness(1.06); }
-    .admin-btn::after{
-      content:"";
-      position:absolute;
-      inset:-30px;
-      background: radial-gradient(closest-side, rgba(37,246,255,.18), transparent 60%);
-      opacity: 0;
-      transform: scale(.7);
-      pointer-events:none;
-      transition: opacity .2s ease;
-    }
-    .admin-btn:hover::after{ opacity: 1; animation: pulse 900ms ease-out infinite; }
 
     .admin-product-grid{
       display:grid;
@@ -938,91 +858,81 @@
       position: relative;
       overflow:hidden;
     }
-    .admin-product-actions-btn::after{
-      content:"";
-      position:absolute;
-      inset:-30px;
-      background: radial-gradient(closest-side, rgba(155,92,255,.18), transparent 60%);
-      opacity: 0;
-      transform: scale(.7);
-      pointer-events:none;
-      transition: opacity .2s ease;
-    }
-    .admin-product-actions-btn:hover::after{ opacity: 1; animation: pulse 900ms ease-out infinite; }
 
-    /* ✅ Category Manager */
-    .cat-manager{
-      margin-top: 16px;
-      padding: 14px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(37,246,255,.06), rgba(255,43,214,.04));
-      box-shadow: var(--shadow);
+    .admin-warning{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,43,214,.25);
+      background: rgba(255,43,214,.08);
+      color: rgba(233,247,255,.95);
+      font-size: 13px;
+      line-height: 1.35;
+      display: none;
+      box-shadow: 0 0 14px rgba(255,43,214,.15);
     }
-    .cat-manager h3{
-      margin: 0 0 8px;
-      font-size: 15px;
+    body.light .admin-warning{
+      color: rgba(12,17,32,.90);
+      border-color: rgba(255,43,214,.22);
+      background: rgba(255,43,214,.08);
+    }
+
+    .category-manager{
+      margin: 16px 0 6px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.08));
+    }
+    .category-manager h3{
+      margin: 0 0 10px;
+      font-size: 14px;
       letter-spacing: .4px;
       text-transform: uppercase;
       color: rgba(233,247,255,.92);
       text-shadow: var(--glow-cyan);
     }
-    .cat-row{
+    .cat-add-row{
       display:flex;
       gap: 10px;
-      align-items:center;
       flex-wrap: wrap;
-      margin-top: 10px;
+      align-items:center;
+      margin-bottom: 10px;
     }
-    .cat-row input{
-      flex: 1 1 260px;
+    .cat-add-row input{
+      flex: 1 1 240px;
     }
     .cat-list{
-      margin-top: 12px;
       display:flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 220px;
-      overflow:auto;
-      padding-right: 4px;
     }
-    .cat-item{
+    .cat-row{
       display:flex;
-      gap: 10px;
       align-items:center;
       justify-content: space-between;
-      padding: 10px 12px;
+      gap: 10px;
+      padding: 10px;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,.10);
-      background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.10));
-      box-shadow: 0 12px 30px rgba(0,0,0,.22);
+      background: rgba(0,0,0,.10);
     }
-    .cat-item .left{
-      display:flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-    .cat-item .label{
-      font-weight: 800;
-      letter-spacing: .2px;
+    .cat-name{
+      font-size: 13px;
+      color: rgba(233,247,255,.92);
       word-break: break-word;
     }
-    .cat-item .meta{
-      font-size: 12px;
-      color: var(--muted);
-      word-break: break-word;
-    }
-    .cat-item .actions{
+    body.light .cat-name{ color: rgba(12,17,32,.90); }
+
+    .cat-actions{
       display:flex;
       gap: 8px;
       flex-wrap: wrap;
-      align-items:center;
     }
-    .cat-danger{
-      border-color: rgba(255,43,214,.26) !important;
-      background: rgba(255,43,214,.10) !important;
-      box-shadow: var(--glow-pink) !important;
+    .cat-actions button{
+      padding: 7px 10px;
+      font-size: 12px;
+      border-radius: 999px;
     }
 
     .suggestion-form{
@@ -1059,12 +969,6 @@
       overflow-y:auto;
       padding-right: 4px;
     }
-    .suggestion-list::-webkit-scrollbar{ width: 10px; }
-    .suggestion-list::-webkit-scrollbar-thumb{
-      background: rgba(255,43,214,.16);
-      border: 1px solid rgba(255,43,214,.22);
-      border-radius: 99px;
-    }
 
     .suggestion-card{
       border-radius: 12px;
@@ -1100,17 +1004,6 @@
       position: relative;
       overflow:hidden;
     }
-    .copy-suggestions-btn::after{
-      content:"";
-      position:absolute;
-      inset:-30px;
-      background: radial-gradient(closest-side, rgba(37,246,255,.18), transparent 60%);
-      opacity: 0;
-      transform: scale(.7);
-      pointer-events:none;
-      transition: opacity .2s ease;
-    }
-    .copy-suggestions-btn:hover::after{ opacity: 1; animation: pulse 900ms ease-out infinite; }
 
     .suggestion-admin-buttons button{
       padding: 6px 10px;
@@ -1121,22 +1014,8 @@
       color: var(--text);
       cursor:pointer;
       margin-left: 6px;
-      position: relative;
-      overflow:hidden;
     }
-    .suggestion-admin-buttons button::after{
-      content:"";
-      position:absolute;
-      inset:-30px;
-      background: radial-gradient(closest-side, rgba(255,255,255,.14), transparent 60%);
-      opacity: 0;
-      transform: scale(.7);
-      pointer-events:none;
-      transition: opacity .2s ease;
-    }
-    .suggestion-admin-buttons button:hover::after{ opacity: 1; animation: pulse 900ms ease-out infinite; }
 
-    /* ========== RESPONSIVE ========== */
     @media (max-width: 600px){
       .top-bar{ flex-direction: column; align-items: flex-start; }
       .search-box{ flex-direction: column; }
@@ -1144,10 +1023,9 @@
       .suggestion-form{ grid-template-columns: 1fr; }
       .admin-product-grid{ grid-template-columns: 1fr; }
       .search-box select{ flex: 1 1 auto; width: 100%; }
-      .cat-row{ flex-direction: column; align-items: stretch; }
+      .quote-meta{ grid-template-columns: 1fr; }
     }
 
-    /* Accessibility - reduce motion */
     @media (prefers-reduced-motion: reduce){
       *{ animation: none !important; transition: none !important; }
     }
@@ -1187,10 +1065,25 @@
       <section id="cartSection" class="sticky-cart neon-frame">
         <div class="cart-actions">
           <span class="cart-count" id="cartCountText"></span>
-          <button class="download-quote-btn" onclick="downloadQuotation()">
-            Download quotation (Excel)
+          <button class="download-quote-btn" onclick="downloadQuotationBOQ()">
+            Download BOQ (CSV)
           </button>
         </div>
+
+        <!-- ✅ BOQ Header Fields -->
+        <div class="quote-meta">
+          <input type="text" id="qClient" placeholder="Client" />
+          <input type="text" id="qLocation" placeholder="Location" />
+          <input type="text" id="qContact" placeholder="Contact" />
+          <input type="text" id="qPhoneEmail" placeholder="Phone/Fax-Email" />
+          <input type="text" id="qProject" placeholder="Project/Type/Name" class="full" />
+          <input type="text" id="qAccountExec" placeholder="Account Executive" />
+          <input type="text" id="qEngineer" placeholder="AV Design Engineer" />
+          <input type="text" id="qEwsControl" placeholder="EWS Control No." />
+          <input type="text" id="qDateToday" placeholder="Date Today (auto)" />
+          <textarea id="qNotes" placeholder="Notes (optional)"></textarea>
+        </div>
+
         <div id="cartContainer"></div>
       </section>
     </aside>
@@ -1218,6 +1111,19 @@
         <button type="button" class="admin-btn" onclick="copySuggestions()">Copy suggestions (CSV)</button>
       </div>
 
+      <!-- ✅ Category Manager -->
+      <div class="category-manager">
+        <h3>Category Manager</h3>
+        <div class="cat-add-row">
+          <input type="text" id="newCategoryName" placeholder="Add new category (e.g. switcher, mic, tripod)" />
+          <button type="button" onclick="addCategoryFromManager()">Add category</button>
+        </div>
+        <div id="categoryList" class="cat-list"></div>
+        <p style="margin:10px 0 0; font-size:12px; opacity:.75;">
+          Tip: Deleting a category can move products to <b>uncategorized</b>.
+        </p>
+      </div>
+
       <h3 style="margin:12px 0 6px; font-size:15px; letter-spacing:.4px; text-transform:uppercase;">
         Manage Products
       </h3>
@@ -1227,13 +1133,15 @@
           <input type="text" id="prodBrand" placeholder="Brand (e.g. DVDO)" />
           <input type="text" id="prodModel" placeholder="Model (required)" required />
           <input type="text" id="prodName" placeholder="Product name / title" />
-
           <select id="prodCategory" required></select>
-
           <input type="text" id="prodImage" placeholder="Image URL (optional)" />
           <textarea id="prodDescription" placeholder="Description"></textarea>
           <textarea id="prodSpecs" placeholder="Specs (one per line, e.g. Resolution: 1080p)"></textarea>
         </div>
+
+        <!-- ✅ Duplicate Detection Warnings -->
+        <div id="adminWarnings" class="admin-warning"></div>
+
         <div class="admin-product-form-buttons">
           <button type="submit" id="productFormSubmitBtn">Add product</button>
           <button type="button" id="productFormCancelEditBtn" style="display:none;" onclick="cancelProductEdit()">
@@ -1243,21 +1151,6 @@
       </form>
 
       <div id="adminProductsList"></div>
-
-      <!-- ✅ Category Manager -->
-      <div class="cat-manager">
-        <h3>Category Manager</h3>
-        <p class="admin-status" style="margin:0;">
-          Add / rename / delete categories. Categories update automatically everywhere.
-        </p>
-
-        <div class="cat-row" style="margin-top:12px;">
-          <input type="text" id="newCategoryLabel" placeholder="New category name (e.g. Switchers, Microphones, Tripods)" />
-          <button type="button" class="admin-btn" onclick="addCategoryFromUI()">Add category</button>
-        </div>
-
-        <div id="categoryList" class="cat-list"></div>
-      </div>
     </div>
   </section>
 
@@ -1278,7 +1171,9 @@
 
     <div class="suggestion-actions">
       <span id="suggestionCountText">No suggestions yet.</span>
-      <button type="button" class="copy-suggestions-btn" onclick="copySuggestions()">Copy all suggestions</button>
+      <button type="button" class="copy-suggestions-btn" onclick="copySuggestions()">
+        Copy all suggestions
+      </button>
     </div>
 
     <div id="suggestionsList" class="suggestion-list"></div>
@@ -1353,9 +1248,8 @@
     const ADMIN_SESSION_KEY = "inventoryIsAdmin";
     const ADMIN_PASSWORD = "microdata";
 
-    /* ✅ Category system */
+    /* Categories */
     const CATEGORIES_STORAGE_KEY = "inventoryCategories";
-    // categories are objects: { id: "camera", label: "Cameras" }
     let categories = [];
 
     let isAdmin = false;
@@ -1376,6 +1270,18 @@
     const cartSection = document.getElementById("cartSection");
     const cartContainer = document.getElementById("cartContainer");
     const cartCountText = document.getElementById("cartCountText");
+
+    /* BOQ meta fields */
+    const qClient = document.getElementById("qClient");
+    const qLocation = document.getElementById("qLocation");
+    const qContact = document.getElementById("qContact");
+    const qPhoneEmail = document.getElementById("qPhoneEmail");
+    const qProject = document.getElementById("qProject");
+    const qAccountExec = document.getElementById("qAccountExec");
+    const qEngineer = document.getElementById("qEngineer");
+    const qEwsControl = document.getElementById("qEwsControl");
+    const qDateToday = document.getElementById("qDateToday");
+    const qNotes = document.getElementById("qNotes");
 
     const suggestionForm = document.getElementById("suggestionForm");
     const suggestBrandInput = document.getElementById("suggestBrand");
@@ -1402,175 +1308,10 @@
     const productFormSubmitBtn = document.getElementById("productFormSubmitBtn");
     const productFormCancelEditBtn = document.getElementById("productFormCancelEditBtn");
     const adminProductsList = document.getElementById("adminProductsList");
+    const adminWarningsEl = document.getElementById("adminWarnings");
 
-    const newCategoryLabelInput = document.getElementById("newCategoryLabel");
+    const newCategoryNameInp = document.getElementById("newCategoryName");
     const categoryListEl = document.getElementById("categoryList");
-
-    /* ---------- HELPERS ---------- */
-    function formatCategoryLabel(cat){
-      return (cat || "")
-        .trim()
-        .toLowerCase()
-        .replace(/[_-]+/g, " ")
-        .split(" ")
-        .filter(Boolean)
-        .map(w => (w.length <= 3 ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1)))
-        .join(" ");
-    }
-
-    function slugifyCategoryId(label){
-      return (label || "")
-        .trim()
-        .toLowerCase()
-        .replace(/&/g, " and ")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/-+/g, "-")
-        .replace(/^-|-$/g, "");
-    }
-    //Duplicate Detection
-    function normText(s){
-  return (s || "")
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
-}
-
-function normModel(s){
-  return (s || "")
-    .toString()
-    .trim()
-    .toUpperCase()
-    .replace(/\s+/g, "");
-}
-
-// Levenshtein distance (for "similar name" detection)
-function levenshtein(a, b){
-  a = normText(a);
-  b = normText(b);
-  if(a === b) return 0;
-  if(!a) return b.length;
-  if(!b) return a.length;
-
-  const m = a.length, n = b.length;
-  const dp = Array.from({length: m + 1}, ()=> Array(n + 1).fill(0));
-  for(let i=0;i<=m;i++) dp[i][0] = i;
-  for(let j=0;j<=n;j++) dp[0][j] = j;
-
-  for(let i=1;i<=m;i++){
-    for(let j=1;j<=n;j++){
-      const cost = a[i-1] === b[j-1] ? 0 : 1;
-      dp[i][j] = Math.min(
-        dp[i-1][j] + 1,
-        dp[i][j-1] + 1,
-        dp[i-1][j-1] + cost
-      );
-    }
-  }
-  return dp[m][n];
-}
-
-function similarityScore(a, b){
-  a = normText(a);
-  b = normText(b);
-  if(!a && !b) return 1;
-  const dist = levenshtein(a, b);
-  const maxLen = Math.max(a.length, b.length) || 1;
-  return 1 - (dist / maxLen); // 0..1
-}
-
-function findDuplicateWarnings({ model, name, ignoreIndex = null }){
-  const targetModel = normModel(model);
-  const targetName  = normText(name);
-
-  const sameModelMatches = [];
-  const similarNameMatches = [];
-
-  products.forEach((p, idx)=>{
-    if(ignoreIndex !== null && idx === ignoreIndex) return;
-
-    const pModel = normModel(p.model);
-    const pName  = normText(p.name);
-
-    if(targetModel && pModel === targetModel){
-      sameModelMatches.push({ idx, p });
-    }
-
-    // Similar name check:
-    // - exact same normalized name
-    // - contains check (one includes the other, with length threshold)
-    // - similarity score >= threshold
-    if(targetName && pName){
-      const contains =
-        (pName.includes(targetName) && targetName.length >= 6) ||
-        (targetName.includes(pName) && pName.length >= 6);
-
-      const score = similarityScore(targetName, pName);
-      const close = score >= 0.82; // tweak if you want more/less strict
-
-      if(pName === targetName || contains || close){
-        // avoid listing the same item twice if it was already same-model
-        similarNameMatches.push({ idx, p, score });
-      }
-    }
-  });
-
-  // dedupe similarName list by model index
-  const seen = new Set();
-  const similarDeduped = [];
-  for(const item of similarNameMatches){
-    if(seen.has(item.idx)) continue;
-    seen.add(item.idx);
-    similarDeduped.push(item);
-  }
-
-  return { sameModelMatches, similarNameMatches: similarDeduped };
-}
-
-function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
-  const { sameModelMatches, similarNameMatches } = findDuplicateWarnings({ model, name, ignoreIndex });
-
-  if(!sameModelMatches.length && !similarNameMatches.length) return true;
-
-  let msg = "⚠️ Possible duplicates found:\n\n";
-
-  if(sameModelMatches.length){
-    msg += "Same MODEL exists:\n";
-    sameModelMatches.slice(0,5).forEach(x=>{
-      msg += `- ${x.p.model} • ${x.p.name || ""} (${x.p.brand || "-"})\n`;
-    });
-    if(sameModelMatches.length > 5) msg += `...and ${sameModelMatches.length - 5} more\n`;
-    msg += "\n";
-  }
-
-  if(similarNameMatches.length){
-    msg += "Similar NAME exists:\n";
-    similarNameMatches.slice(0,5).forEach(x=>{
-      const pct = Math.round((x.score ?? 0) * 100);
-      msg += `- ${x.p.name || ""} • ${x.p.model} (${x.p.brand || "-"}) [~${pct}%]\n`;
-    });
-    if(similarNameMatches.length > 5) msg += `...and ${similarNameMatches.length - 5} more\n`;
-    msg += "\n";
-  }
-
-  msg += "Continue saving anyway?";
-
-  return confirm(msg);
-}
-    function findCategoryLabelById(id){
-      const cat = categories.find(c => c.id === id);
-      return cat ? cat.label : (id ? formatCategoryLabel(id) : "Uncategorized");
-    }
-
-    function ensureCategoryExists(id, labelIfMissing){
-      const cleanId = (id || "").trim().toLowerCase();
-      if(!cleanId) return;
-      if(!categories.some(c => c.id === cleanId)){
-        categories.push({ id: cleanId, label: labelIfMissing || formatCategoryLabel(cleanId) });
-        categories.sort((a,b)=>a.label.localeCompare(b.label));
-        saveCategories();
-      }
-    }
 
     /* ---------- STORAGE HELPERS ---------- */
     function loadProducts(){
@@ -1613,236 +1354,205 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       localStorage.setItem(SUGGESTIONS_STORAGE_KEY, JSON.stringify(suggestions));
     }
 
-    /* ---------- ✅ CATEGORIES (LOAD/SAVE/SYNC) ---------- */
-    function loadCategories(){
-      try{
-        const raw = localStorage.getItem(CATEGORIES_STORAGE_KEY);
-        if(raw){
-          const parsed = JSON.parse(raw);
-          if(Array.isArray(parsed) && parsed.length){
-            // accept either objects or strings (backward compatibility)
-            categories = parsed.map(x=>{
-              if(typeof x === "string") return { id: x.trim().toLowerCase(), label: formatCategoryLabel(x) };
-              return { id: String(x.id||"").trim().toLowerCase(), label: String(x.label||"").trim() || formatCategoryLabel(x.id) };
-            }).filter(c=>c.id);
-          }
-        }
-      }catch(e){}
+    /* ---------- CATEGORIES ---------- */
+    function normalizeCategory(cat){
+      return (cat || "").trim().toLowerCase();
+    }
 
-      if(!categories.length){
-        categories = [
-          { id:"camera", label:"Cameras" },
-          { id:"converter", label:"Converters" },
-          { id:"accessory", label:"Accessories" },
-          { id:"uncategorized", label:"Uncategorized" }
-        ];
-      }
-
-      // Ensure all product categories exist in the manager
-      const fromProducts = products
-        .map(p => (p.category || "").trim().toLowerCase())
-        .filter(Boolean);
-
-      fromProducts.forEach(id => ensureCategoryExists(id));
-      ensureCategoryExists("uncategorized", "Uncategorized");
-
-      categories.sort((a,b)=>a.label.localeCompare(b.label));
-      saveCategories();
+    function formatCategoryLabel(cat){
+      return (cat || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[_-]+/g, " ")
+        .split(" ")
+        .filter(Boolean)
+        .map(w => (w.length <= 3 ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1)))
+        .join(" ");
     }
 
     function saveCategories(){
       localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(categories));
     }
 
-    function syncProductsCategoryIds(){
-      // If a product has empty category, make it uncategorized
-      let changed = false;
-      products.forEach(p=>{
-        const cat = (p.category || "").trim().toLowerCase();
-        if(!cat){
-          p.category = "uncategorized";
-          changed = true;
-        }else{
-          // ensure it exists in manager
-          ensureCategoryExists(cat);
-        }
-      });
-      if(changed) saveProducts();
+    function syncCategoriesFromProducts(){
+      const fromProducts = products
+        .map(p => normalizeCategory(p.category))
+        .filter(Boolean);
+
+      const set = new Set(categories.map(normalizeCategory).filter(Boolean));
+      fromProducts.forEach(c => set.add(c));
+
+      // Always keep a safe default
+      set.add("uncategorized");
+
+      categories = Array.from(set).sort();
+      saveCategories();
     }
 
-    /* ---------- ✅ DROPDOWNS (TOP + ADMIN) ---------- */
-    function renderTopCategoryDropdown(){
-      const opts = categories
-        .filter(c => c.id !== "__add_new__")
-        .slice()
-        .sort((a,b)=>a.label.localeCompare(b.label));
+    function loadCategories(){
+      try{
+        const raw = localStorage.getItem(CATEGORIES_STORAGE_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          if(Array.isArray(parsed)) categories = parsed.map(normalizeCategory).filter(Boolean);
+        }
+      }catch(e){}
 
+      if(!categories.length){
+        const fromProducts = products.map(p => normalizeCategory(p.category)).filter(Boolean);
+        categories = Array.from(new Set(["camera","converter","accessory","uncategorized", ...fromProducts])).sort();
+        saveCategories();
+      }else{
+        // ensure uncategorized exists
+        if(!categories.includes("uncategorized")){
+          categories.push("uncategorized");
+          categories.sort();
+          saveCategories();
+        }
+      }
+
+      syncCategoriesFromProducts();
+    }
+
+    function renderCategoryOptions(){
+      // Search dropdown uses categories
+      const list = categories.slice().sort();
       categorySelect.innerHTML = `
         <option value="all">All Categories</option>
-        ${opts.map(c => `<option value="${c.id}">${c.label}</option>`).join("")}
+        ${list.map(c => `<option value="${c}">${formatCategoryLabel(c)}</option>`).join("")}
       `;
     }
 
     function renderAdminCategoryDropdown(selectedValue = ""){
-      const selected = (selectedValue || "").trim().toLowerCase();
-      const opts = categories.slice().sort((a,b)=>a.label.localeCompare(b.label));
-
+      const selected = normalizeCategory(selectedValue);
       prodCategoryInput.innerHTML = `
-        <option value="" disabled ${selected ? "" : "selected"}>Select category</option>
-        ${opts.map(c => `<option value="${c.id}" ${c.id === selected ? "selected" : ""}>${c.label}</option>`).join("")}
-        <option value="__add_new__">+ Add new category...</option>
+        ${categories.map(c => `
+          <option value="${c}" ${c === selected ? "selected" : ""}>${formatCategoryLabel(c)}</option>
+        `).join("")}
       `;
+      if(!selected && categories.includes("uncategorized")){
+        prodCategoryInput.value = "uncategorized";
+      }
     }
 
-    prodCategoryInput.addEventListener("change", (e)=>{
-      if(e.target.value === "__add_new__"){
-        const label = prompt("Enter new category name:", "");
-        if(!label){
-          renderAdminCategoryDropdown(editingProductIndex !== null ? (products[editingProductIndex]?.category || "") : "");
-          return;
-        }
-        addCategory(label, true);
-      }
-    });
-
-    /* ---------- ✅ CATEGORY MANAGER UI ---------- */
     function renderCategoryManager(){
       if(!isAdmin){
         categoryListEl.innerHTML = "";
         return;
       }
+      const list = categories.slice().sort();
 
-      const usage = {};
-      products.forEach(p=>{
-        const id = (p.category || "uncategorized").trim().toLowerCase() || "uncategorized";
-        usage[id] = (usage[id] || 0) + 1;
-      });
-
-      const rows = categories
-        .slice()
-        .sort((a,b)=>a.label.localeCompare(b.label))
-        .map(c=>{
-          const count = usage[c.id] || 0;
-          const locked = (c.id === "uncategorized"); // keep one safe fallback
-          return `
-            <div class="cat-item">
-              <div class="left">
-                <div class="label">${c.label}</div>
-                <div class="meta">ID: <strong>${c.id}</strong> • Used by <strong>${count}</strong> product(s)</div>
-              </div>
-              <div class="actions">
-                <button type="button" class="admin-product-actions-btn" onclick="renameCategoryPrompt('${c.id}')">Rename</button>
-                <button type="button" class="admin-product-actions-btn ${locked ? "cat-danger" : ""}" onclick="deleteCategoryPrompt('${c.id}')" ${locked ? "disabled title='Cannot delete Uncategorized'" : ""}>
-                  Delete
-                </button>
-              </div>
-            </div>
-          `;
-        }).join("");
-
-      categoryListEl.innerHTML = rows || `<p style="opacity:.8; margin:0;">No categories yet.</p>`;
+      categoryListEl.innerHTML = list.map(c => `
+        <div class="cat-row">
+          <div class="cat-name">${formatCategoryLabel(c)} <span style="opacity:.7;">(${c})</span></div>
+          <div class="cat-actions">
+            <button type="button" class="admin-btn" onclick="renameCategoryPrompt('${c}')">Rename</button>
+            <button type="button" class="admin-btn" onclick="deleteCategoryPrompt('${c}')">Delete</button>
+          </div>
+        </div>
+      `).join("");
     }
 
-    function addCategoryFromUI(){
-      const label = newCategoryLabelInput.value.trim();
-      if(!label){
+    function addCategoryFromManager(){
+      if(!isAdmin) return;
+      let name = (newCategoryNameInp.value || "").trim().toLowerCase();
+      if(!name){
         alert("Please enter a category name.");
         return;
       }
-      addCategory(label, false);
-      newCategoryLabelInput.value = "";
-    }
-
-    function addCategory(label, alsoSelectInAdmin){
-      const id = slugifyCategoryId(label);
-      if(!id){
+      name = normalizeCategory(name);
+      if(!name){
         alert("Invalid category name.");
         return;
       }
-
-      if(categories.some(c => c.id === id)){
-        // If exists, optionally update label if different
-        const existing = categories.find(c => c.id === id);
-        if(existing && existing.label !== label.trim()){
-          existing.label = label.trim();
-          saveCategories();
-        }
-      }else{
-        categories.push({ id, label: label.trim() });
-        categories.sort((a,b)=>a.label.localeCompare(b.label));
+      if(!categories.includes(name)){
+        categories.push(name);
+        categories.sort();
         saveCategories();
       }
-
-      // refresh everything
-      renderTopCategoryDropdown();
-      renderAdminCategoryDropdown(id);
+      newCategoryNameInp.value = "";
+      renderCategoryOptions();
+      renderAdminCategoryDropdown(prodCategoryInput.value);
       renderCategoryManager();
       searchProduct();
+    }
 
-      if(alsoSelectInAdmin){
-        prodCategoryInput.value = id;
+    function renameCategoryPrompt(oldCat){
+      if(!isAdmin) return;
+      const oldNorm = normalizeCategory(oldCat);
+      if(!oldNorm) return;
+
+      let next = prompt(`Rename category:\n\nCurrent: ${oldNorm}\n\nEnter new name:`, oldNorm);
+      if(next == null) return;
+      next = normalizeCategory(next);
+      if(!next){
+        alert("Invalid category name.");
+        return;
       }
-    }
-
-    function renameCategoryPrompt(id){
-      const cat = categories.find(c => c.id === id);
-      if(!cat) return;
-
-      const newLabel = prompt(`Rename category "${cat.label}" to:`, cat.label);
-      if(!newLabel) return;
-
-      cat.label = newLabel.trim();
-      saveCategories();
-
-      renderTopCategoryDropdown();
-      renderAdminCategoryDropdown(editingProductIndex !== null ? (products[editingProductIndex]?.category || "") : "");
-      renderCategoryManager();
-      searchProduct();
-    }
-
-    function deleteCategoryPrompt(id){
-      const cat = categories.find(c => c.id === id);
-      if(!cat) return;
-      if(id === "uncategorized"){
-        alert("You cannot delete Uncategorized.");
+      if(next === oldNorm){
+        return;
+      }
+      if(categories.includes(next)){
+        alert("That category already exists.");
         return;
       }
 
-      const usedCount = products.filter(p => (p.category || "").trim().toLowerCase() === id).length;
+      // Update categories array
+      categories = categories.map(c => (c === oldNorm ? next : c));
+      categories = Array.from(new Set(categories)).sort();
 
-      let moveTo = "uncategorized";
-      if(usedCount > 0){
-        const msg =
-          `This category is used by ${usedCount} product(s).\n\n` +
-          `Type the CATEGORY ID to move them to (or leave blank for "uncategorized"):\n\n` +
-          categories.map(c=>`- ${c.id} (${c.label})`).join("\n");
-        const input = prompt(msg, "uncategorized");
-        if(input && input.trim()){
-          const target = input.trim().toLowerCase();
-          if(!categories.some(c => c.id === target)){
-            alert("That category ID does not exist.");
-            return;
-          }
-          moveTo = target;
+      // Update products using old category
+      products = products.map(p => {
+        const pc = normalizeCategory(p.category);
+        if(pc === oldNorm){
+          return { ...p, category: next };
         }
+        return p;
+      });
+
+      saveCategories();
+      saveProducts();
+
+      renderCategoryOptions();
+      renderAdminCategoryDropdown(next);
+      renderCategoryManager();
+      renderAdminProducts();
+      searchProduct();
+    }
+
+    function deleteCategoryPrompt(cat){
+      if(!isAdmin) return;
+      const norm = normalizeCategory(cat);
+      if(!norm) return;
+      if(norm === "uncategorized"){
+        alert("You cannot delete 'uncategorized'.");
+        return;
       }
 
-      if(!confirm(`Delete category "${cat.label}"?`)) return;
+      const usedCount = products.filter(p => normalizeCategory(p.category) === norm).length;
+      const msg = usedCount
+        ? `This category is used by ${usedCount} product(s).\n\nIf you delete it, those products will be moved to 'uncategorized'.\n\nDelete anyway?`
+        : `Delete category '${norm}'?`;
 
-      // move products first
-      products.forEach(p=>{
-        const pCat = (p.category || "").trim().toLowerCase();
-        if(pCat === id) p.category = moveTo;
+      if(!confirm(msg)) return;
+
+      // Remove from categories
+      categories = categories.filter(c => c !== norm);
+      if(!categories.includes("uncategorized")) categories.push("uncategorized");
+      categories = Array.from(new Set(categories)).sort();
+      saveCategories();
+
+      // Move products
+      products = products.map(p => {
+        if(normalizeCategory(p.category) === norm){
+          return { ...p, category: "uncategorized" };
+        }
+        return p;
       });
       saveProducts();
 
-      // remove category
-      categories = categories.filter(c => c.id !== id);
-      saveCategories();
-
-      // refresh everything
-      renderTopCategoryDropdown();
-      renderAdminCategoryDropdown(editingProductIndex !== null ? (products[editingProductIndex]?.category || "") : "");
+      renderCategoryOptions();
+      renderAdminCategoryDropdown("uncategorized");
       renderCategoryManager();
       renderAdminProducts();
       searchProduct();
@@ -1881,10 +1591,9 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
           const model = (p.model || "").toLowerCase();
           const name  = (p.name || "").toLowerCase();
           const brand = (p.brand || "").toLowerCase();
-
           const matchesText = !query || model.includes(query) || name.includes(query) || brand.includes(query);
 
-          const pCat = (p.category || "uncategorized").trim().toLowerCase();
+          const pCat = normalizeCategory(p.category);
           const matchesCategory = (selectedCategory === "all") || (pCat === selectedCategory);
 
           return matchesText && matchesCategory;
@@ -1903,17 +1612,16 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
           card.className = "result-card";
 
           const isChecked = compareSelection.includes(product.model);
-          const catId = (product.category || "uncategorized").trim().toLowerCase();
-          const catLabel = findCategoryLabelById(catId);
+          const catLabel = formatCategoryLabel(product.category || "");
 
           card.innerHTML = `
             <div class="result-header">
               <div>
                 <p class="result-model">Model: ${product.model}</p>
-                <h2 class="result-name">${product.name}</h2>
+                <h2 class="result-name">${product.name || "-"}</h2>
                 <p class="result-meta">
                   <strong>Brand:</strong> ${product.brand || "-"}
-                  <span class="chip">${catLabel}</span>
+                  <span class="chip">${catLabel || "Uncategorized"}</span>
                 </p>
               </div>
               <div class="result-actions">
@@ -1925,14 +1633,14 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
               </div>
             </div>
             <p class="result-description">${product.description || ""}</p>
-            ${product.image ? `<img class="result-image" src="${product.image}" alt="${product.name}">` : ""}
+            ${product.image ? `<img class="result-image" src="${product.image}" alt="${(product.name||product.model).replace(/"/g,"&quot;")}">` : ""}
           `;
 
           resultsContainer.appendChild(card);
         });
 
         renderCompare();
-      }, 260);
+      }, 180);
     }
 
     searchButton.addEventListener("click", searchProduct);
@@ -1984,11 +1692,11 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
         <table class="compare-table">
           <tr>
             <th>Feature</th>
-            ${selectedProducts.map(p=>`<th>${p.name}</th>`).join("")}
+            ${selectedProducts.map(p=>`<th>${p.name || "-"}</th>`).join("")}
           </tr>
           <tr>
             <th>Image</th>
-            ${selectedProducts.map(p=>`<td>${p.image ? `<img class="compare-image" src="${p.image}" alt="${p.name}">` : "-"}</td>`).join("")}
+            ${selectedProducts.map(p=>`<td>${p.image ? `<img class="compare-image" src="${p.image}" alt="${(p.name||p.model).replace(/"/g,"&quot;")}">` : "-"}</td>`).join("")}
           </tr>
           <tr>
             <th>Model</th>
@@ -2000,10 +1708,7 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
           </tr>
           <tr>
             <th>Category</th>
-            ${selectedProducts.map(p=>{
-              const id = (p.category || "uncategorized").trim().toLowerCase();
-              return `<td>${findCategoryLabelById(id)}</td>`;
-            }).join("")}
+            ${selectedProducts.map(p=>`<td>${formatCategoryLabel(p.category || "")}</td>`).join("")}
           </tr>
           <tr>
             <th>Description</th>
@@ -2027,7 +1732,7 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       compareContainer.innerHTML = tableHtml;
     }
 
-    /* ---------- CART / QUOTATION (CARD LIST) ---------- */
+    /* ---------- CART ---------- */
     function addToCart(model){
       const product = products.find(p=>p.model === model);
       if(!product) return;
@@ -2037,7 +1742,7 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       else{
         cart.push({
           model: product.model,
-          name: product.name,
+          name: product.name || "",
           brand: product.brand || "",
           description: product.description || "",
           quantity: 1
@@ -2102,6 +1807,7 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       `;
     }
 
+    /* ---------- CSV HELPERS ---------- */
     function csvEscape(value){
       if(value == null) return "";
       const str = String(value);
@@ -2109,31 +1815,118 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       return str;
     }
 
-    function downloadQuotation(){
+    function peso0(){
+      // keep as plain 0.00 (safer for CSV import); user can format as currency in Excel
+      return "0.00";
+    }
+
+    function todayISO(){
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    /* ---------- BOQ / ESTIMATED WORKSHEET EXPORT ---------- */
+    function downloadQuotationBOQ(){
       if(cart.length === 0){
-        alert("Cart is empty. Add products before generating a quotation.");
+        alert("Cart is empty. Add products before generating a BOQ CSV.");
         return;
       }
 
-      const rows = [];
-      rows.push(["Brand","Model","Description","Quantity"]);
+      // Header fields
+      const meta = {
+        client: (qClient.value || "").trim(),
+        location: (qLocation.value || "").trim(),
+        dateToday: (qDateToday.value || "").trim() || todayISO(),
+        contact: (qContact.value || "").trim(),
+        phoneEmail: (qPhoneEmail.value || "").trim(),
+        project: (qProject.value || "").trim(),
+        accountExec: (qAccountExec.value || "").trim(),
+        engineer: (qEngineer.value || "").trim(),
+        ews: (qEwsControl.value || "").trim(),
+        notes: (qNotes.value || "").trim()
+      };
 
-      cart.forEach(item=>{
+      const rows = [];
+
+      // --- Title + Header area (keeps "blank spaces" feel)
+      rows.push(["ESTIMATED WORKSHEET"]);
+      rows.push([]);
+      rows.push(["CLIENT", meta.client, "", "Location", meta.location, "", "Date Today:", meta.dateToday]);
+      rows.push(["CONTACT", meta.contact, "", "Account Executive:", meta.accountExec]);
+      rows.push(["Phone/Fax-Email", meta.phoneEmail, "", "Av Design Engineer:", meta.engineer]);
+      rows.push(["Project/Type/Name", meta.project, "", "EWS Control No.", meta.ews]);
+      if(meta.notes){
+        rows.push(["Notes", meta.notes]);
+      }
+      rows.push([]);
+      rows.push([]);
+
+      // --- MAIN I
+      rows.push(["MAIN I - EQUIPMENT / HARDWARE PRODUCTS"]);
+      rows.push(["Item","Brand","Part #","Model","Specification","Qty","UOM","COST","TOTAL COST","Price or Mark Up Level"]);
+      rows.push(["(Room Name)"]);
+      // cart items
+      let itemNo = 1;
+      cart.forEach(ci=>{
+        const p = products.find(pp=>pp.model === ci.model);
+        const brand = (p && p.brand) ? p.brand : (ci.brand || "");
+        const model = ci.model || "";
+        const spec = (p && (p.description || p.name)) ? (p.description || p.name) : (ci.description || ci.name || "");
+        const qty = ci.quantity || 0;
         rows.push([
-          csvEscape(item.brand || ""),
-          csvEscape(item.model),
-          csvEscape(item.description),
-          csvEscape(item.quantity)
+          String(itemNo++),
+          brand,
+          "",                 // Part # blank
+          model,
+          spec,
+          String(qty),
+          "unit(s)",
+          peso0(),
+          peso0(),
+          ""
         ]);
       });
 
-      const csvContent = rows.map(r=>r.join(",")).join("\r\n");
+      rows.push([]);
+      rows.push(["Sub Total-for Equipment/Hardware Products A", "", "", "", "", "", "", peso0()]);
+      rows.push([]);
+      rows.push(["Sub Total-for Licenses/Non-Tangible Products B", "", "", "", "", "", "", peso0()]);
+      rows.push([]);
+      rows.push(["Total Main I: A & B", "", "", "", "", "", "", peso0()]);
+      rows.push([]);
+      rows.push([]);
+
+      // --- MAIN II placeholder (kept intentionally NOT auto-filled)
+      rows.push(["MAIN II - GENERAL SERVICES"]);
+      rows.push(["(Manpower / SI Materials / Other Expenses are not auto-filled by the inventory tool.)"]);
+      rows.push([]);
+      rows.push(["LABOR/MANPOWER EXPENSE"]);
+      rows.push(["(Fill this section in your official workbook as needed.)"]);
+      rows.push([]);
+      rows.push(["OTHER EXPENSES"]);
+      rows.push(["(Fill this section in your official workbook as needed.)"]);
+      rows.push([]);
+      rows.push([]);
+
+      // --- MAIN III placeholder
+      rows.push(["MAIN III - MISCELLANEOUS COMPULSORY ALLOCATION"]);
+      rows.push(["(Fill this section in your official workbook as needed.)"]);
+      rows.push([]);
+      rows.push(["GRAND TOTAL (Main I, II & III)", "", "", "", "", "", "", peso0()]);
+      rows.push([]);
+
+      const csvContent = rows.map(r => r.map(csvEscape).join(",")).join("\r\n");
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      const today = new Date().toISOString().slice(0,10);
       link.href = url;
-      link.download = `quotation_${today}.csv`;
+
+      const safeClient = (meta.client || "client").replace(/[^\w\-]+/g,"_").slice(0,40);
+      link.download = `Estimated_Worksheet_${safeClient}_${todayISO()}.csv`;
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -2158,6 +1951,125 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       if(!specs || typeof specs !== "object") return "";
       return Object.entries(specs).map(([k,v])=>`${k}: ${v}`).join("\n");
     }
+
+    /* ---------- DUPLICATE DETECTION ---------- */
+    function normalizeModel(m){
+      return (m || "").trim().toLowerCase();
+    }
+
+    function normalizeName(n){
+      return (n || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").replace(/\s+/g," ").trim();
+    }
+
+    // Dice coefficient over bigrams: fast + good enough
+    function diceSimilarity(a, b){
+      a = normalizeName(a);
+      b = normalizeName(b);
+      if(!a || !b) return 0;
+      if(a === b) return 1;
+
+      function bigrams(s){
+        const out = [];
+        const str = ` ${s} `;
+        for(let i=0;i<str.length-1;i++){
+          out.push(str.slice(i,i+2));
+        }
+        return out;
+      }
+
+      const ab = bigrams(a);
+      const bb = bigrams(b);
+      const map = new Map();
+      ab.forEach(x => map.set(x, (map.get(x)||0)+1));
+      let hits = 0;
+      bb.forEach(x=>{
+        const c = map.get(x)||0;
+        if(c>0){
+          hits++;
+          map.set(x, c-1);
+        }
+      });
+
+      return (2 * hits) / (ab.length + bb.length);
+    }
+
+    function findDuplicateWarnings({ model, name, editingIndex }){
+      const warnings = [];
+      const m = normalizeModel(model);
+      const n = (name || "").trim();
+
+      if(m){
+        const sameModelIndex = products.findIndex((p, idx)=>{
+          if(editingIndex != null && idx === editingIndex) return false;
+          return normalizeModel(p.model) === m;
+        });
+
+        if(sameModelIndex !== -1){
+          const p = products[sameModelIndex];
+          warnings.push(`⚠️ Same model already exists: <b>${p.model}</b> (${p.brand || "-"} • ${p.name || "-"})`);
+        }
+      }
+
+      if(n){
+        const candidates = products
+          .map((p, idx)=>({ p, idx }))
+          .filter(x => (editingIndex == null) || (x.idx !== editingIndex))
+          .filter(x => (x.p && x.p.name))
+          .map(x => ({
+            idx: x.idx,
+            model: x.p.model,
+            brand: x.p.brand || "-",
+            name: x.p.name || "-",
+            score: diceSimilarity(n, x.p.name || "")
+          }))
+          .filter(x => x.score >= 0.78)
+          .sort((a,b)=>b.score-a.score)
+          .slice(0, 4);
+
+        if(candidates.length){
+          warnings.push(`⚠️ Similar product name found:`);
+          candidates.forEach(c=>{
+            warnings.push(`• <b>${c.name}</b> (Model: ${c.model}, Brand: ${c.brand}) — similarity ${(c.score*100).toFixed(0)}%`);
+          });
+        }
+      }
+
+      return warnings;
+    }
+
+    function showAdminWarnings(lines){
+      if(!lines || !lines.length){
+        adminWarningsEl.style.display = "none";
+        adminWarningsEl.innerHTML = "";
+        return;
+      }
+      adminWarningsEl.style.display = "block";
+      adminWarningsEl.innerHTML = lines.join("<br>");
+    }
+
+    function clearAdminWarnings(){
+      showAdminWarnings([]);
+    }
+
+    /* Live warnings while typing */
+    prodModelInput.addEventListener("input", ()=>{
+      if(!isAdmin) return;
+      const lines = findDuplicateWarnings({
+        model: prodModelInput.value,
+        name: prodNameInput.value,
+        editingIndex: editingProductIndex
+      });
+      showAdminWarnings(lines);
+    });
+    prodNameInput.addEventListener("input", ()=>{
+      if(!isAdmin) return;
+      const lines = findDuplicateWarnings({
+        model: prodModelInput.value,
+        name: prodNameInput.value,
+        editingIndex: editingProductIndex
+      });
+      showAdminWarnings(lines);
+    });
 
     /* ---------- SUGGESTIONS ---------- */
     function renderSuggestions(){
@@ -2261,23 +2173,19 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       if(!s) return;
 
       const defaultName = (s.name || `${s.brand || ""} ${s.model || ""}`).trim();
-      const choices = categories.map(c=>`${c.id} (${c.label})`).join("\n");
-      let categoryId = prompt(
-        "Enter CATEGORY ID for this product (or type a NEW name to create one):\n\n" + choices,
+
+      // choose category from categories list
+      let category = prompt(
+        "Enter category for this product (must match an existing category OR type a new one):",
         "converter"
       );
+      if(!category) category = "uncategorized";
+      category = normalizeCategory(category);
 
-      if(!categoryId) categoryId = "uncategorized";
-      categoryId = categoryId.trim();
-
-      // If they typed a label instead of id, create id from it
-      let finalCatId = slugifyCategoryId(categoryId);
-      if(!finalCatId) finalCatId = "uncategorized";
-
-      // If not existing, add it as new category (label = what they typed)
-      if(!categories.some(c=>c.id === finalCatId)){
-        addCategory(categoryId, false); // uses label -> id
-        finalCatId = slugifyCategoryId(categoryId);
+      if(!categories.includes(category)){
+        categories.push(category);
+        categories.sort();
+        saveCategories();
       }
 
       const image = prompt("Enter image URL for this product (optional):", "") || "";
@@ -2288,7 +2196,7 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
         model: (s.model || "").trim(),
         brand: (s.brand || "").trim(),
         name: defaultName || "New Product",
-        category: finalCatId,
+        category,
         description: s.notes || s.name || "",
         image,
         specs
@@ -2299,21 +2207,20 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
         return;
       }
 
-      const existingIndex = products.findIndex(p=>p.model === newProduct.model);
+      const existingIndex = products.findIndex(p=>normalizeModel(p.model) === normalizeModel(newProduct.model));
       if(existingIndex !== -1){
-        if(!confirm("A product with this model already exists. Replace it?")) return;
+        if(!confirm("A product with this model already exists (case-insensitive match). Replace it?")) return;
         products[existingIndex] = newProduct;
       }else{
         products.push(newProduct);
       }
 
       saveProducts();
+      syncCategoriesFromProducts();
       suggestions.splice(index, 1);
       saveSuggestions();
 
-      // refresh UI
-      syncProductsCategoryIds();
-      renderTopCategoryDropdown();
+      renderCategoryOptions();
       renderAdminCategoryDropdown();
       renderCategoryManager();
       renderSuggestions();
@@ -2339,22 +2246,18 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
         return;
       }
 
-      const rowsHtml = products.map((p, index)=>{
-        const id = (p.category || "uncategorized").trim().toLowerCase() || "uncategorized";
-        const label = findCategoryLabelById(id);
-        return `
-          <tr>
-            <td>${p.brand || "-"}</td>
-            <td>${p.model}</td>
-            <td>${p.name || ""}</td>
-            <td>${label}</td>
-            <td>
-              <button type="button" class="admin-product-actions-btn" onclick="startEditProduct(${index})">Edit</button>
-              <button type="button" class="admin-product-actions-btn" onclick="deleteProduct(${index})">Delete</button>
-            </td>
-          </tr>
-        `;
-      }).join("");
+      const rowsHtml = products.map((p, index)=>`
+        <tr>
+          <td>${p.brand || "-"}</td>
+          <td>${p.model}</td>
+          <td>${p.name || ""}</td>
+          <td>${formatCategoryLabel(p.category || "uncategorized")}</td>
+          <td>
+            <button type="button" class="admin-product-actions-btn" onclick="startEditProduct(${index})">Edit</button>
+            <button type="button" class="admin-product-actions-btn" onclick="deleteProduct(${index})">Delete</button>
+          </td>
+        </tr>
+      `).join("");
 
       adminProductsList.innerHTML = `
         <table class="admin-products-table">
@@ -2368,70 +2271,87 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
           ${rowsHtml}
         </table>`;
     }
-//duplicate detection 
-  productForm.addEventListener("submit", (event)=>{
-  event.preventDefault();
-  if(!isAdmin){ alert("Admin only."); return; }
 
-  const brand = prodBrandInput.value.trim();
-  const model = prodModelInput.value.trim();
-  const name = prodNameInput.value.trim();
-  let category = (prodCategoryInput.value || "").trim().toLowerCase();
-  const image = prodImageInput.value.trim();
-  const description = prodDescriptionInput.value.trim();
-  const specsText = prodSpecsInput.value.trim();
-  const specs = parseSpecsFromString(specsText);
+    productForm.addEventListener("submit", (event)=>{
+      event.preventDefault();
+      if(!isAdmin){ alert("Admin only."); return; }
 
-  if(!model){ alert("Model is required."); return; }
-  if(!category || category === "__add_new__") category = "uncategorized";
-  ensureCategoryExists(category);
+      const brand = prodBrandInput.value.trim();
+      const model = prodModelInput.value.trim();
+      const name = prodNameInput.value.trim();
+      let category = normalizeCategory(prodCategoryInput.value || "");
+      const image = prodImageInput.value.trim();
+      const description = prodDescriptionInput.value.trim();
+      const specsText = prodSpecsInput.value.trim();
+      const specs = parseSpecsFromString(specsText);
 
-  const productData = {
-    model,
-    brand,
-    name: name || `${brand} ${model}`.trim() || "New Product",
-    category,
-    description,
-    image,
-    specs
-  };
+      if(!model){ alert("Model is required."); return; }
+      if(!category) category = "uncategorized";
+      if(!categories.includes(category)){
+        categories.push(category);
+        categories.sort();
+        saveCategories();
+      }
 
-  // ✅ Duplicate detection (ignore the current row if editing)
-  const ok = showDuplicateWarningAndConfirm({
-    model: productData.model,
-    name: productData.name,
-    ignoreIndex: editingProductIndex !== null ? editingProductIndex : null
-  });
-  if(!ok) return;
+      const productData = {
+        model: model.trim(),
+        brand,
+        name: name || `${brand} ${model}`.trim() || "New Product",
+        category,
+        description,
+        image,
+        specs
+      };
 
-  if(editingProductIndex !== null){
-    products[editingProductIndex] = productData;
-  }else{
-    // still keep your existing "replace exact model" behavior
-    const existingIndex = products.findIndex(p => normModel(p.model) === normModel(model));
-    if(existingIndex !== -1){
-      if(!confirm("A product with this model already exists. Replace it?")) return;
-      products[existingIndex] = productData;
-    }else{
-      products.push(productData);
-    }
-  }
+      // ✅ Duplicate warnings -> confirm before saving
+      const warnLines = findDuplicateWarnings({
+        model: productData.model,
+        name: productData.name,
+        editingIndex: editingProductIndex
+      });
 
-  saveProducts();
-  syncProductsCategoryIds();
-  saveCategories();
+      if(warnLines.length){
+        showAdminWarnings(warnLines);
+        const proceed = confirm(
+          "Duplicate / Similar item detected.\n\nDo you want to continue saving this product?"
+        );
+        if(!proceed) return;
+      }
 
-  productForm.reset();
-  editingProductIndex = null;
-  productFormSubmitBtn.textContent = "Add product";
-  productFormCancelEditBtn.style.display = "none";
+      // Same-model replace (case-insensitive) logic
+      const existingIndex = products.findIndex((p, idx)=>{
+        if(editingProductIndex != null && idx === editingProductIndex) return false;
+        return normalizeModel(p.model) === normalizeModel(productData.model);
+      });
 
-  renderTopCategoryDropdown();
-  renderAdminCategoryDropdown();
-  renderCategoryManager();
-  renderAdminProducts();
-  searchProduct();
-});
+      if(editingProductIndex !== null){
+        // editing existing row
+        products[editingProductIndex] = productData;
+      }else if(existingIndex !== -1){
+        // add mode but model exists -> ask to replace
+        const ok = confirm("Same model already exists (case-insensitive). Replace the existing product?");
+        if(!ok) return;
+        products[existingIndex] = productData;
+      }else{
+        products.push(productData);
+      }
+
+      saveProducts();
+      syncCategoriesFromProducts();
+
+      productForm.reset();
+      editingProductIndex = null;
+      productFormSubmitBtn.textContent = "Add product";
+      productFormCancelEditBtn.style.display = "none";
+      clearAdminWarnings();
+
+      renderCategoryOptions();
+      renderAdminCategoryDropdown();
+      renderCategoryManager();
+      renderAdminProducts();
+      searchProduct();
+    });
+
     function startEditProduct(index){
       if(!isAdmin) return;
       const p = products[index];
@@ -2441,17 +2361,21 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       prodBrandInput.value = p.brand || "";
       prodModelInput.value = p.model || "";
       prodNameInput.value = p.name || "";
-
-      const catId = (p.category || "uncategorized").trim().toLowerCase();
-      ensureCategoryExists(catId);
-      renderAdminCategoryDropdown(catId);
-
+      renderAdminCategoryDropdown(p.category || "uncategorized");
       prodImageInput.value = p.image || "";
       prodDescriptionInput.value = p.description || "";
       prodSpecsInput.value = specsToText(p.specs);
 
       productFormSubmitBtn.textContent = "Save changes";
       productFormCancelEditBtn.style.display = "inline-block";
+
+      // update warnings for edit context
+      const lines = findDuplicateWarnings({
+        model: prodModelInput.value,
+        name: prodNameInput.value,
+        editingIndex: editingProductIndex
+      });
+      showAdminWarnings(lines);
 
       window.scrollTo({ top: document.getElementById("adminSection").offsetTop, behavior: "smooth" });
     }
@@ -2469,12 +2393,15 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       compareSelection = compareSelection.filter(m=>m !== model);
       cart = cart.filter(item=>item.model !== model);
 
-      syncProductsCategoryIds();
+      syncCategoriesFromProducts();
+      renderCategoryOptions();
+      renderAdminCategoryDropdown();
       renderCategoryManager();
       renderAdminProducts();
       renderCart();
       renderCompare();
       searchProduct();
+      clearAdminWarnings();
     }
 
     function cancelProductEdit(){
@@ -2482,6 +2409,7 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       productForm.reset();
       productFormSubmitBtn.textContent = "Add product";
       productFormCancelEditBtn.style.display = "none";
+      clearAdminWarnings();
       renderAdminCategoryDropdown();
     }
 
@@ -2496,7 +2424,6 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
         adminLoggedOut.style.display = "block";
         adminStatusText.textContent = "Not logged in.";
       }
-
       renderSuggestions();
       renderAdminProducts();
       renderCategoryManager();
@@ -2519,6 +2446,7 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
       isAdmin = false;
       sessionStorage.removeItem(ADMIN_SESSION_KEY);
       updateAdminUI();
+      clearAdminWarnings();
     }
 
     function initAdmin(){
@@ -2529,23 +2457,23 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
 
     /* ---------- INIT ---------- */
     loadProducts();
-    syncProductsCategoryIds();
     loadCategories();
-
-    renderTopCategoryDropdown();
-    renderAdminCategoryDropdown();
-
+    renderCategoryOptions();
+    renderAdminCategoryDropdown("uncategorized");
     loadSuggestions();
     initAdmin();
     searchProduct();
 
-    /* expose functions */
+    // default Date Today field
+    qDateToday.value = todayISO();
+
+    // expose globals used in inline handlers
     window.toggleCompare = toggleCompare;
     window.clearCompare = clearCompare;
     window.addToCart = addToCart;
     window.removeFromCart = removeFromCart;
     window.updateCartQuantity = updateCartQuantity;
-    window.downloadQuotation = downloadQuotation;
+    window.downloadQuotationBOQ = downloadQuotationBOQ;
 
     window.copySuggestions = copySuggestions;
     window.deleteSuggestion = deleteSuggestion;
@@ -2555,11 +2483,9 @@ function showDuplicateWarningAndConfirm({ model, name, ignoreIndex = null }){
     window.startEditProduct = startEditProduct;
     window.deleteProduct = deleteProduct;
     window.cancelProductEdit = cancelProductEdit;
-
     window.adminLogout = adminLogout;
 
-    // Category Manager exports
-    window.addCategoryFromUI = addCategoryFromUI;
+    window.addCategoryFromManager = addCategoryFromManager;
     window.renameCategoryPrompt = renameCategoryPrompt;
     window.deleteCategoryPrompt = deleteCategoryPrompt;
   </script>
