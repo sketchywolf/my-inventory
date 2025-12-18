@@ -97,18 +97,10 @@
     body.dark { color-scheme: dark; }
     body.light { color-scheme: light; }
 
-    /* Better dropdown readability in dark mode (including opened list on many browsers) */
     body.dark select{
       background: linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92));
-      color: #e9f7ff;
-      border: 1px solid rgba(37,246,255,.35);
-      box-shadow: 0 0 0 1px rgba(37,246,255,.10), 0 10px 30px rgba(0,0,0,.35);
-      appearance: none;
-    }
-    body.dark select:focus{
-      outline: none;
-      border-color: rgba(37,246,255,.70);
-      box-shadow: 0 0 0 3px rgba(37,246,255,.18), 0 10px 30px rgba(0,0,0,.45);
+      color: var(--text);
+      border: 1px solid rgba(37,246,255,.25);
     }
     body.dark select option{
       background: #0b0f1a;
@@ -116,10 +108,9 @@
     }
 
     body.light select{
-      background: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.9);
       color: #0c1120;
       border: 1px solid rgba(20,40,60,.18);
-      appearance: none;
     }
     body.light select option{
       background: #ffffff;
@@ -161,42 +152,6 @@
       color: transparent;
       text-shadow: var(--glow-cyan), var(--glow-pink);
     }
-    .glitch::before,
-    .glitch::after{
-      content: attr(data-text);
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .glitch:hover::before{
-      opacity: .8;
-      transform: translate(1px, -1px);
-      text-shadow: 0 0 10px rgba(37,246,255,.45);
-      animation: glitchShift 700ms steps(2,end) infinite;
-      clip-path: polygon(0 2%, 100% 2%, 100% 25%, 0 25%);
-    }
-    .glitch:hover::after{
-      opacity: .75;
-      transform: translate(-1px, 1px);
-      text-shadow: 0 0 10px rgba(255,43,214,.35);
-      animation: glitchShift 650ms steps(2,end) infinite reverse;
-      clip-path: polygon(0 55%, 100% 55%, 100% 78%, 0 78%);
-    }
-    @keyframes glitchShift{
-      0%{ transform: translate(0,0); }
-      20%{ transform: translate(1px,-1px); }
-      40%{ transform: translate(-1px,1px); }
-      60%{ transform: translate(2px,0); }
-      80%{ transform: translate(-2px,0); }
-      100%{ transform: translate(0,0); }
-    }
 
     /* ========== BUTTONS / INPUTS ========== */
     .theme-toggle{
@@ -214,33 +169,6 @@
       overflow: hidden;
     }
 
-    .theme-toggle::after{
-      content:"";
-      position:absolute;
-      inset: -30px;
-      background: radial-gradient(closest-side, rgba(37,246,255,.18), transparent 60%);
-      opacity: 0;
-      transform: scale(.7);
-      transition: opacity .2s ease;
-      pointer-events:none;
-    }
-    .theme-toggle:hover::after{
-      opacity: 1;
-      animation: pulse 900ms ease-out infinite;
-    }
-    @keyframes pulse{
-      0%{ transform: scale(.65); opacity: .0; }
-      30%{ opacity: .65; }
-      100%{ transform: scale(1.15); opacity: 0; }
-    }
-
-    .theme-toggle:hover{
-      transform: translateY(-1px);
-      border-color: rgba(37,246,255,.55);
-      box-shadow: var(--shadow), var(--glow-cyan);
-      filter: brightness(1.05);
-    }
-
     .search-box{
       display:flex;
       flex-wrap: wrap;
@@ -255,9 +183,7 @@
     .admin-login-form input,
     .admin-product-form input,
     .admin-product-form select,
-    .admin-product-form textarea,
-    .quote-meta input,
-    .quote-meta textarea{
+    .admin-product-form textarea{
       padding: 10px 12px;
       font-size: 15px;
       border-radius: 12px;
@@ -274,23 +200,17 @@
     .suggestion-form textarea::placeholder,
     .admin-login-form input::placeholder,
     .admin-product-form input::placeholder,
-    .admin-product-form textarea::placeholder,
-    .quote-meta input::placeholder,
-    .quote-meta textarea::placeholder{
+    .admin-product-form textarea::placeholder{
       color: rgba(233,247,255,.45);
     }
 
     .search-box input{ flex: 1 1 260px; }
-    .search-box select{
-      flex: 0 0 210px;
-      cursor: pointer;
-    }
+    .search-box select{ flex: 0 0 210px; cursor: pointer; }
 
     .search-box button,
     .suggestion-form button,
     .admin-login-form button,
-    .admin-product-form button,
-    .category-manager button{
+    .admin-product-form button{
       padding: 10px 16px;
       font-size: 15px;
       cursor: pointer;
@@ -304,15 +224,6 @@
       transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
       position: relative;
       overflow: hidden;
-    }
-    .search-box button:hover,
-    .suggestion-form button:hover,
-    .admin-login-form button:hover,
-    .admin-product-form button:hover,
-    .category-manager button:hover{
-      transform: translateY(-1px);
-      filter: brightness(1.06);
-      box-shadow: var(--shadow), var(--glow-cyan), var(--glow-pink);
     }
 
     /* ========== MAIN LAYOUT ========== */
@@ -331,40 +242,23 @@
       overflow-y: auto;
       padding-right: 4px;
     }
-    .sidebar::-webkit-scrollbar{ width: 10px; }
-    .sidebar::-webkit-scrollbar-thumb{
-      background: rgba(37,246,255,.18);
-      border: 1px solid rgba(37,246,255,.22);
-      border-radius: 99px;
-    }
 
     @media (max-width: 900px){
       .layout{ grid-template-columns: 1fr; }
-      .sidebar{
-        position: static;
-        max-height: none;
-        overflow: visible;
-        padding-right: 0;
-      }
+      .sidebar{ position: static; max-height: none; overflow: visible; padding-right: 0; }
     }
 
     /* ========== RESULT CARDS ========== */
     .result-card{
       border: 1px solid transparent;
       border-radius: 14px;
-
       background:
         linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
         linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
-
       background-size: 100% 100%, 300% 300%;
       padding: 16px;
       margin-bottom: 12px;
-
-      box-shadow:
-        0 0 0 1px rgba(37,246,255,.2),
-        0 10px 30px rgba(0,0,0,.55);
-
+      box-shadow: 0 0 0 1px rgba(37,246,255,.2), 0 10px 30px rgba(0,0,0,.55);
       opacity: 0;
       transform: translateY(10px);
       animation: fadeIn 0.35s forwards, neonShift 10s linear infinite;
@@ -374,16 +268,6 @@
       0%   { background-position: 0% 50%, 0% 50%; }
       50%  { background-position: 0% 50%, 100% 50%; }
       100% { background-position: 0% 50%, 0% 50%; }
-    }
-
-    .result-card:hover{
-      box-shadow:
-        0 0 0 1px rgba(37,246,255,.4),
-        0 0 20px rgba(37,246,255,.25),
-        0 0 26px rgba(255,43,214,.2),
-        0 12px 36px rgba(0,0,0,.6);
-      transform: translateY(-2px);
-      transition: transform .12s ease;
     }
 
     .result-header{
@@ -409,11 +293,7 @@
       text-shadow: var(--glow-cyan);
     }
 
-    .result-meta{
-      margin: 0;
-      font-size: 13px;
-      color: var(--muted);
-    }
+    .result-meta{ margin: 0; font-size: 13px; color: var(--muted); }
 
     .chip{
       display:inline-block;
@@ -427,11 +307,7 @@
       color: var(--text);
     }
 
-    .result-description{
-      margin: 10px 0 0;
-      color: rgba(233,247,255,.88);
-      line-height: 1.45;
-    }
+    .result-description{ margin: 10px 0 0; color: rgba(233,247,255,.82); line-height: 1.45; }
 
     .result-image{
       margin-top: 14px;
@@ -456,7 +332,7 @@
       gap: 6px;
       cursor:pointer;
       user-select:none;
-      color: rgba(233,247,255,.90);
+      color: rgba(233,247,255,.85);
     }
 
     .add-cart-btn{
@@ -470,17 +346,9 @@
       box-shadow: var(--glow-pink);
       transition: transform .12s ease, filter .2s ease;
       white-space: nowrap;
-      position: relative;
-      overflow: hidden;
-    }
-    .add-cart-btn:hover{
-      transform: translateY(-1px);
-      filter: brightness(1.06);
     }
 
-    @keyframes fadeIn{
-      to{ opacity:1; transform: translateY(0); }
-    }
+    @keyframes fadeIn{ to{ opacity:1; transform: translateY(0); } }
 
     /* ========== LOADER / NO RESULT ========== */
     .loader{
@@ -524,10 +392,7 @@
       margin-bottom: 10px;
     }
 
-    .compare-count{
-      font-size: 13px;
-      color: var(--muted);
-    }
+    .compare-count{ font-size: 13px; color: var(--muted); }
 
     .clear-compare-btn{
       padding: 8px 12px;
@@ -538,8 +403,6 @@
       color: var(--text);
       cursor:pointer;
       box-shadow: var(--glow-cyan);
-      position: relative;
-      overflow:hidden;
     }
 
     .compare-table{
@@ -570,7 +433,7 @@
       box-shadow: 0 10px 25px rgba(0,0,0,.55);
     }
 
-    /* ========== CART / QUOTATION (CARD LIST LAYOUT) ========== */
+    /* ========== CART ========== */
     #cartSection{
       padding: 14px;
       border-radius: var(--radius);
@@ -585,9 +448,7 @@
         linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
       background-size: 100% 100%, 300% 300%;
       animation: neonShift 10s linear infinite;
-      box-shadow:
-        0 0 0 1px rgba(37,246,255,.2),
-        0 10px 30px rgba(0,0,0,.55);
+      box-shadow: 0 0 0 1px rgba(37,246,255,.2), 0 10px 30px rgba(0,0,0,.55);
     }
 
     .cart-actions{
@@ -599,10 +460,7 @@
       margin-bottom: 10px;
     }
 
-    .cart-count{
-      font-size: 13px;
-      color: var(--muted);
-    }
+    .cart-count{ font-size: 13px; color: var(--muted); }
 
     .download-quote-btn{
       padding: 10px 14px;
@@ -614,48 +472,7 @@
       cursor:pointer;
       box-shadow: 0 0 14px rgba(49,255,139,.25);
       white-space: nowrap;
-      transition: transform .12s ease, filter .2s ease;
-      position: relative;
-      overflow:hidden;
     }
-    .download-quote-btn:hover{
-      transform: translateY(-1px);
-      filter: brightness(1.06);
-    }
-
-    .quote-meta{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 10px 0 12px;
-      padding: 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.10));
-    }
-    .quote-meta textarea{
-      grid-column: 1 / -1;
-      min-height: 70px;
-      resize: vertical;
-    }
-    .quote-meta .full{
-      grid-column: 1 / -1;
-    }
-/* ✅ Fix cart meta fields overflowing the cart border (CSS grid min-width issue) */
-.quote-meta > *{
-  min-width: 0;       /* allow grid items to shrink */
-  max-width: 100%;
-}
-
-.quote-meta input,
-.quote-meta textarea{
-  width: 100%;
-  min-width: 0;
-}
-
-#cartSection{
-  overflow: hidden;   /* prevents any glow/border from spilling outside */
-}
 
     .cart-list{
       display:flex;
@@ -669,8 +486,6 @@
       background: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.12));
       box-shadow: 0 14px 35px rgba(0,0,0,.45);
       padding: 12px;
-      position: relative;
-      overflow: hidden;
     }
 
     .cart-top{
@@ -681,50 +496,15 @@
       margin-bottom: 8px;
     }
 
-    .cart-title{
-      display:flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-    }
+    .cart-title{ display:flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .cart-title .brand{ font-size: 12px; text-transform: uppercase; letter-spacing: .45px; color: var(--muted); }
+    .cart-title .model{ font-size: 14px; font-weight: 800; letter-spacing: .3px; text-shadow: var(--glow-cyan); word-break: break-word; }
 
-    .cart-title .brand{
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .45px;
-      color: var(--muted);
-    }
-    .cart-title .model{
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: .3px;
-      text-shadow: var(--glow-cyan);
-      word-break: break-word;
-    }
+    .cart-desc{ font-size: 13px; color: rgba(233,247,255,.86); line-height: 1.45; margin: 6px 0 10px; word-break: break-word; }
 
-    .cart-desc{
-      font-size: 13px;
-      color: rgba(233,247,255,.90);
-      line-height: 1.45;
-      margin: 6px 0 10px;
-      word-break: break-word;
-    }
+    .cart-controls{ display:flex; align-items:center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 
-    .cart-controls{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .qty-wrap{
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--muted);
-    }
+    .qty-wrap{ display:flex; align-items:center; gap: 8px; font-size: 12px; color: var(--muted); }
 
     .cart-item input[type="number"]{
       width: 80px;
@@ -734,7 +514,6 @@
       background: rgba(0,0,0,.22);
       color: var(--text);
       outline: none;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
     }
 
     .remove-cart-btn{
@@ -746,13 +525,6 @@
       color: var(--text);
       cursor:pointer;
       box-shadow: var(--glow-pink);
-      transition: transform .12s ease, filter .2s ease;
-      position: relative;
-      overflow:hidden;
-    }
-    .remove-cart-btn:hover{
-      transform: translateY(-1px);
-      filter: brightness(1.06);
     }
 
     /* ========== ADMIN + SUGGESTION PANELS ========== */
@@ -774,11 +546,7 @@
       text-shadow: var(--glow-cyan);
     }
 
-    .admin-status{
-      font-size: 13px;
-      color: var(--muted);
-      margin: 0 0 10px;
-    }
+    .admin-status{ font-size: 13px; color: var(--muted); margin: 0 0 10px; }
 
     .admin-login-form{
       display:flex;
@@ -804,10 +572,7 @@
       cursor:pointer;
       box-shadow: var(--glow-cyan);
       font-size: 13px;
-      position: relative;
-      overflow:hidden;
     }
-    .admin-btn:hover{ filter: brightness(1.06); }
 
     .admin-product-grid{
       display:grid;
@@ -819,6 +584,7 @@
       resize: vertical;
       min-height: 70px;
     }
+
     .admin-product-form-buttons{
       margin-top: 10px;
       display:flex;
@@ -854,85 +620,6 @@
       color: var(--text);
       cursor:pointer;
       margin-right: 6px;
-      box-shadow: 0 0 12px rgba(155,92,255,.20);
-      position: relative;
-      overflow:hidden;
-    }
-
-    .admin-warning{
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,43,214,.25);
-      background: rgba(255,43,214,.08);
-      color: rgba(233,247,255,.95);
-      font-size: 13px;
-      line-height: 1.35;
-      display: none;
-      box-shadow: 0 0 14px rgba(255,43,214,.15);
-    }
-    body.light .admin-warning{
-      color: rgba(12,17,32,.90);
-      border-color: rgba(255,43,214,.22);
-      background: rgba(255,43,214,.08);
-    }
-
-    .category-manager{
-      margin: 16px 0 6px;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.08));
-    }
-    .category-manager h3{
-      margin: 0 0 10px;
-      font-size: 14px;
-      letter-spacing: .4px;
-      text-transform: uppercase;
-      color: rgba(233,247,255,.92);
-      text-shadow: var(--glow-cyan);
-    }
-    .cat-add-row{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items:center;
-      margin-bottom: 10px;
-    }
-    .cat-add-row input{
-      flex: 1 1 240px;
-    }
-    .cat-list{
-      display:flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .cat-row{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.10);
-    }
-    .cat-name{
-      font-size: 13px;
-      color: rgba(233,247,255,.92);
-      word-break: break-word;
-    }
-    body.light .cat-name{ color: rgba(12,17,32,.90); }
-
-    .cat-actions{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .cat-actions button{
-      padding: 7px 10px;
-      font-size: 12px;
-      border-radius: 999px;
     }
 
     .suggestion-form{
@@ -941,14 +628,8 @@
       gap: 10px;
       margin-bottom: 12px;
     }
-    .suggestion-form textarea{
-      grid-column: 1 / -1;
-      min-height: 70px;
-    }
-    .suggestion-form button{
-      grid-column: 1 / -1;
-      justify-self: flex-start;
-    }
+    .suggestion-form textarea{ grid-column: 1 / -1; min-height: 70px; }
+    .suggestion-form button{ grid-column: 1 / -1; justify-self: flex-start; }
 
     .suggestion-actions{
       display:flex;
@@ -977,6 +658,7 @@
       background: linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.12));
       box-shadow: 0 12px 30px rgba(0,0,0,.35);
     }
+
     .suggestion-card-header{
       display:flex;
       justify-content: space-between;
@@ -984,13 +666,9 @@
       margin-bottom: 4px;
       font-weight: 700;
       align-items:center;
-      text-shadow: var(--glow-pink);
     }
-    .suggestion-card-meta{
-      font-size: 12px;
-      opacity: .75;
-      margin-bottom: 6px;
-    }
+
+    .suggestion-card-meta{ font-size: 12px; opacity: .75; margin-bottom: 6px; }
 
     .copy-suggestions-btn{
       padding: 8px 12px;
@@ -1001,19 +679,6 @@
       cursor:pointer;
       font-size: 13px;
       box-shadow: var(--glow-cyan);
-      position: relative;
-      overflow:hidden;
-    }
-
-    .suggestion-admin-buttons button{
-      padding: 6px 10px;
-      font-size: 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      cursor:pointer;
-      margin-left: 6px;
     }
 
     @media (max-width: 600px){
@@ -1023,11 +688,6 @@
       .suggestion-form{ grid-template-columns: 1fr; }
       .admin-product-grid{ grid-template-columns: 1fr; }
       .search-box select{ flex: 1 1 auto; width: 100%; }
-      .quote-meta{ grid-template-columns: 1fr; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      *{ animation: none !important; transition: none !important; }
     }
   </style>
 </head>
@@ -1065,31 +725,13 @@
       <section id="cartSection" class="sticky-cart neon-frame">
         <div class="cart-actions">
           <span class="cart-count" id="cartCountText"></span>
-          <button class="download-quote-btn" onclick="downloadQuotationBOQ()">
-            Download BOQ (CSV)
-          </button>
+          <button class="download-quote-btn" onclick="downloadQuotation()">Download quotation (CSV)</button>
         </div>
-
-        <!-- ✅ BOQ Header Fields -->
-        <div class="quote-meta">
-          <input type="text" id="qClient" placeholder="Client" />
-          <input type="text" id="qLocation" placeholder="Location" />
-          <input type="text" id="qContact" placeholder="Contact" />
-          <input type="text" id="qPhoneEmail" placeholder="Phone/Fax-Email" />
-          <input type="text" id="qProject" placeholder="Project/Type/Name" class="full" />
-          <input type="text" id="qAccountExec" placeholder="Account Executive" />
-          <input type="text" id="qEngineer" placeholder="AV Design Engineer" />
-          <input type="text" id="qEwsControl" placeholder="EWS Control No." />
-          <input type="text" id="qDateToday" placeholder="Date Today (auto)" />
-          <textarea id="qNotes" placeholder="Notes (optional)"></textarea>
-        </div>
-
         <div id="cartContainer"></div>
       </section>
     </aside>
   </div>
 
-  <!-- Admin Panel -->
   <section id="adminSection">
     <h2>Admin Panel</h2>
     <p class="admin-status" id="adminStatusText">Not logged in.</p>
@@ -1111,19 +753,6 @@
         <button type="button" class="admin-btn" onclick="copySuggestions()">Copy suggestions (CSV)</button>
       </div>
 
-      <!-- ✅ Category Manager -->
-      <div class="category-manager">
-        <h3>Category Manager</h3>
-        <div class="cat-add-row">
-          <input type="text" id="newCategoryName" placeholder="Add new category (e.g. switcher, mic, tripod)" />
-          <button type="button" onclick="addCategoryFromManager()">Add category</button>
-        </div>
-        <div id="categoryList" class="cat-list"></div>
-        <p style="margin:10px 0 0; font-size:12px; opacity:.75;">
-          Tip: Deleting a category can move products to <b>uncategorized</b>.
-        </p>
-      </div>
-
       <h3 style="margin:12px 0 6px; font-size:15px; letter-spacing:.4px; text-transform:uppercase;">
         Manage Products
       </h3>
@@ -1138,10 +767,6 @@
           <textarea id="prodDescription" placeholder="Description"></textarea>
           <textarea id="prodSpecs" placeholder="Specs (one per line, e.g. Resolution: 1080p)"></textarea>
         </div>
-
-        <!-- ✅ Duplicate Detection Warnings -->
-        <div id="adminWarnings" class="admin-warning"></div>
-
         <div class="admin-product-form-buttons">
           <button type="submit" id="productFormSubmitBtn">Add product</button>
           <button type="button" id="productFormCancelEditBtn" style="display:none;" onclick="cancelProductEdit()">
@@ -1154,7 +779,6 @@
     </div>
   </section>
 
-  <!-- Suggestion Box -->
   <section id="suggestionSection">
     <h2>Product Suggestion Box</h2>
     <p style="font-size:14px; opacity:0.8; margin:0 0 10px;">
@@ -1171,16 +795,32 @@
 
     <div class="suggestion-actions">
       <span id="suggestionCountText">No suggestions yet.</span>
-      <button type="button" class="copy-suggestions-btn" onclick="copySuggestions()">
-        Copy all suggestions
-      </button>
+      <button type="button" class="copy-suggestions-btn" onclick="copySuggestions()">Copy all suggestions</button>
     </div>
 
     <div id="suggestionsList" class="suggestion-list"></div>
   </section>
 
   <script>
-    /* ---------- DATA & STORAGE ---------- */
+    /***********************
+     * BACKEND (Google Apps Script)
+     ***********************/
+    const API_BASE = "https://script.google.com/macros/s/AKfycbzGVGW8EZ8R8Mi3gcXYJ7H6aJHtaK99CFkRK9Wp7q0nc8Z4FjnaD9DehlX51vMAEKcuSQ/exec";
+
+    async function apiGet(path){
+      const res = await fetch(`${API_BASE}?path=${encodeURIComponent(path)}`, { method:"GET" });
+      return await res.json();
+    }
+    async function apiPost(payload){
+      const res = await fetch(API_BASE, {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    }
+
+    /* ---------- DATA ---------- */
     const DEFAULT_PRODUCTS = [
       {
         model: "DVDO-C4-1-B",
@@ -1190,72 +830,23 @@
         description: "Full HD PTZ Camera with HDMI/IP/3G-SDI/USB & AI Auto Tracking (Black)",
         image: "https://dvdo.com/cdn/shop/products/DVDO-C4-1-2_700x.png?v=1672342619",
         specs: { "Resolution": "1080p", "Outputs": "HDMI, 3G-SDI, USB, IP", "AI Auto Tracking": "Yes", "Optical Zoom": "12x", "Color": "Black" }
-      },
-      {
-        model: "DVDO-C5-1-B",
-        brand: "DVDO",
-        name: "DVDO PTZ CAMERA 4K",
-        category: "camera",
-        description: "4K PTZ Camera with HDMI/IP/3G-SDI/USB & AI Auto Tracking (Black)",
-        image: "https://dvdo.com/cdn/shop/files/C5-1BlackFront-croppednoshade_700x.png?v=1713050748",
-        specs: { "Resolution": "4K", "Outputs": "HDMI, 3G-SDI, USB, IP", "AI Auto Tracking": "Yes", "Optical Zoom": "12x", "Color": "Black" }
-      },
-      {
-        model: "DVDO-CB-5-B",
-        brand: "DVDO",
-        name: "DVDO PTZ CAMERA BRACKET",
-        category: "accessory",
-        description: "Black Ceiling Bracket for C3 & C7WIFI PTZ Cameras",
-        image: "https://dvdo.com/cdn/shop/files/DVDO-CB-5-Bpicture1_1024x.jpg?v=1748024159",
-        specs: { "Type": "Ceiling Bracket", "Compatible Models": "C3, C7WIFI", "Color": "Black", "Material": "Metal" }
-      },
-      {
-        model: "U-BRIDGE USB-C",
-        brand: "INOGENI",
-        name: "INOGENI USB BRIDGE",
-        category: "converter",
-        description: "USB-C EXT – USB and DP Alt Mode",
-        image: "https://inogeni.com/wp-content/uploads/2025/03/Front-ISO-Hero-430x300-1.png",
-        specs: { "Interface": "USB-C", "Function": "USB & DP Alt Mode Extension", "Use Case": "USB bridge / extender" }
-      },
-      {
-        model: "SDI2USB3",
-        brand: "INOGENI",
-        name: "INOGENI SDI TO USB CONVERTER",
-        category: "converter",
-        description: "3G-SDI to USB 3.0 video converter (+ loop)",
-        image: "https://inogeni.com/wp-content/uploads/2022/09/inogeni-sdi2usb3-header-product-1.png",
-        specs: { "Input": "3G-SDI", "Output": "USB 3.0", "Loop Output": "Yes", "Max Resolution": "Up to 1080p" }
-      },
-      {
-        model: "CAP-1",
-        brand: "DATAVIDEO",
-        name: "DATAVIDEO SDI TO USB CONVERTER",
-        category: "converter",
-        description: "3SDI to USB 3.0 Capture Box",
-        image: "https://d3c9kujynjspib.cloudfront.net/images/33673c36e0c073fe12812e08.jpg",
-        specs: { "Input": "3G-SDI", "Output": "USB 3.0", "Use Case": "Capture Box", "Max Resolution": "Up to 1080p" }
       }
     ];
 
     let products = [];
+    let categories = []; // from backend
     let compareSelection = [];
     let cart = [];
     let suggestions = [];
 
-    const PRODUCTS_STORAGE_KEY = "inventoryProducts";
     const SUGGESTIONS_STORAGE_KEY = "inventorySuggestions";
     const ADMIN_SESSION_KEY = "inventoryIsAdmin";
     const ADMIN_PASSWORD = "microdata";
 
-    /* Categories */
-    const CATEGORIES_STORAGE_KEY = "inventoryCategories";
-    let categories = [];
-
     let isAdmin = false;
     let editingProductIndex = null;
 
-    /* ---------- DOM ELEMENTS ---------- */
+    /* ---------- DOM ---------- */
     const searchInput = document.getElementById("searchInput");
     const searchButton = document.getElementById("searchButton");
     const noResultEl = document.getElementById("noResult");
@@ -1270,18 +861,6 @@
     const cartSection = document.getElementById("cartSection");
     const cartContainer = document.getElementById("cartContainer");
     const cartCountText = document.getElementById("cartCountText");
-
-    /* BOQ meta fields */
-    const qClient = document.getElementById("qClient");
-    const qLocation = document.getElementById("qLocation");
-    const qContact = document.getElementById("qContact");
-    const qPhoneEmail = document.getElementById("qPhoneEmail");
-    const qProject = document.getElementById("qProject");
-    const qAccountExec = document.getElementById("qAccountExec");
-    const qEngineer = document.getElementById("qEngineer");
-    const qEwsControl = document.getElementById("qEwsControl");
-    const qDateToday = document.getElementById("qDateToday");
-    const qNotes = document.getElementById("qNotes");
 
     const suggestionForm = document.getElementById("suggestionForm");
     const suggestBrandInput = document.getElementById("suggestBrand");
@@ -1308,57 +887,8 @@
     const productFormSubmitBtn = document.getElementById("productFormSubmitBtn");
     const productFormCancelEditBtn = document.getElementById("productFormCancelEditBtn");
     const adminProductsList = document.getElementById("adminProductsList");
-    const adminWarningsEl = document.getElementById("adminWarnings");
 
-    const newCategoryNameInp = document.getElementById("newCategoryName");
-    const categoryListEl = document.getElementById("categoryList");
-
-    /* ---------- STORAGE HELPERS ---------- */
-    function loadProducts(){
-      try{
-        const raw = localStorage.getItem(PRODUCTS_STORAGE_KEY);
-        if(raw){
-          const parsed = JSON.parse(raw);
-          if(Array.isArray(parsed) && parsed.length){
-            products = parsed;
-            return;
-          }
-        }
-      }catch(e){
-        console.warn("Failed to load products, using defaults.", e);
-      }
-      products = DEFAULT_PRODUCTS.slice();
-    }
-
-    function saveProducts(){
-      try{
-        localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(products));
-      }catch(e){
-        console.warn("Failed to save products.", e);
-      }
-    }
-
-    function loadSuggestions(){
-      try{
-        const raw = localStorage.getItem(SUGGESTIONS_STORAGE_KEY);
-        if(raw){
-          suggestions = JSON.parse(raw) || [];
-        }
-      }catch(e){
-        suggestions = [];
-      }
-      renderSuggestions();
-    }
-
-    function saveSuggestions(){
-      localStorage.setItem(SUGGESTIONS_STORAGE_KEY, JSON.stringify(suggestions));
-    }
-
-    /* ---------- CATEGORIES ---------- */
-    function normalizeCategory(cat){
-      return (cat || "").trim().toLowerCase();
-    }
-
+    /* ---------- HELPERS ---------- */
     function formatCategoryLabel(cat){
       return (cat || "")
         .trim()
@@ -1370,195 +900,51 @@
         .join(" ");
     }
 
-    function saveCategories(){
-      localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(categories));
+    function normalizeName(s){
+      return (s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
     }
 
-    function syncCategoriesFromProducts(){
-      const fromProducts = products
-        .map(p => normalizeCategory(p.category))
-        .filter(Boolean);
+    // basic "similar" detector: shared long tokens + partial includes
+    function isSimilarName(a, b){
+      const A = normalizeName(a);
+      const B = normalizeName(b);
+      if(!A || !B) return false;
+      if(A === B) return true;
+      if(A.includes(B) || B.includes(A)) return true;
 
-      const set = new Set(categories.map(normalizeCategory).filter(Boolean));
-      fromProducts.forEach(c => set.add(c));
-
-      // Always keep a safe default
-      set.add("uncategorized");
-
-      categories = Array.from(set).sort();
-      saveCategories();
+      const aTokens = new Set(A.split(" ").filter(w => w.length >= 4));
+      const bTokens = new Set(B.split(" ").filter(w => w.length >= 4));
+      let common = 0;
+      aTokens.forEach(t => { if(bTokens.has(t)) common++; });
+      return common >= 2; // tweakable
     }
 
-    function loadCategories(){
-      try{
-        const raw = localStorage.getItem(CATEGORIES_STORAGE_KEY);
-        if(raw){
-          const parsed = JSON.parse(raw);
-          if(Array.isArray(parsed)) categories = parsed.map(normalizeCategory).filter(Boolean);
-        }
-      }catch(e){}
-
-      if(!categories.length){
-        const fromProducts = products.map(p => normalizeCategory(p.category)).filter(Boolean);
-        categories = Array.from(new Set(["camera","converter","accessory","uncategorized", ...fromProducts])).sort();
-        saveCategories();
-      }else{
-        // ensure uncategorized exists
-        if(!categories.includes("uncategorized")){
-          categories.push("uncategorized");
-          categories.sort();
-          saveCategories();
-        }
-      }
-
-      syncCategoriesFromProducts();
-    }
-
-    function renderCategoryOptions(){
-      // Search dropdown uses categories
-      const list = categories.slice().sort();
-      categorySelect.innerHTML = `
-        <option value="all">All Categories</option>
-        ${list.map(c => `<option value="${c}">${formatCategoryLabel(c)}</option>`).join("")}
-      `;
-    }
-
-    function renderAdminCategoryDropdown(selectedValue = ""){
-      const selected = normalizeCategory(selectedValue);
-      prodCategoryInput.innerHTML = `
-        ${categories.map(c => `
-          <option value="${c}" ${c === selected ? "selected" : ""}>${formatCategoryLabel(c)}</option>
-        `).join("")}
-      `;
-      if(!selected && categories.includes("uncategorized")){
-        prodCategoryInput.value = "uncategorized";
-      }
-    }
-
-    function renderCategoryManager(){
-      if(!isAdmin){
-        categoryListEl.innerHTML = "";
-        return;
-      }
-      const list = categories.slice().sort();
-
-      categoryListEl.innerHTML = list.map(c => `
-        <div class="cat-row">
-          <div class="cat-name">${formatCategoryLabel(c)} <span style="opacity:.7;">(${c})</span></div>
-          <div class="cat-actions">
-            <button type="button" class="admin-btn" onclick="renameCategoryPrompt('${c}')">Rename</button>
-            <button type="button" class="admin-btn" onclick="deleteCategoryPrompt('${c}')">Delete</button>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function addCategoryFromManager(){
-      if(!isAdmin) return;
-      let name = (newCategoryNameInp.value || "").trim().toLowerCase();
-      if(!name){
-        alert("Please enter a category name.");
-        return;
-      }
-      name = normalizeCategory(name);
-      if(!name){
-        alert("Invalid category name.");
-        return;
-      }
-      if(!categories.includes(name)){
-        categories.push(name);
-        categories.sort();
-        saveCategories();
-      }
-      newCategoryNameInp.value = "";
-      renderCategoryOptions();
-      renderAdminCategoryDropdown(prodCategoryInput.value);
-      renderCategoryManager();
-      searchProduct();
-    }
-
-    function renameCategoryPrompt(oldCat){
-      if(!isAdmin) return;
-      const oldNorm = normalizeCategory(oldCat);
-      if(!oldNorm) return;
-
-      let next = prompt(`Rename category:\n\nCurrent: ${oldNorm}\n\nEnter new name:`, oldNorm);
-      if(next == null) return;
-      next = normalizeCategory(next);
-      if(!next){
-        alert("Invalid category name.");
-        return;
-      }
-      if(next === oldNorm){
-        return;
-      }
-      if(categories.includes(next)){
-        alert("That category already exists.");
-        return;
-      }
-
-      // Update categories array
-      categories = categories.map(c => (c === oldNorm ? next : c));
-      categories = Array.from(new Set(categories)).sort();
-
-      // Update products using old category
-      products = products.map(p => {
-        const pc = normalizeCategory(p.category);
-        if(pc === oldNorm){
-          return { ...p, category: next };
-        }
-        return p;
+    function parseSpecsFromString(text){
+      const specs = {};
+      if(!text) return specs;
+      text.split(/\r?\n/).forEach(line=>{
+        const trimmed = line.trim();
+        if(!trimmed) return;
+        const [key, ...rest] = trimmed.split(":");
+        const value = rest.join(":").trim();
+        if(key) specs[key.trim()] = value || "";
       });
-
-      saveCategories();
-      saveProducts();
-
-      renderCategoryOptions();
-      renderAdminCategoryDropdown(next);
-      renderCategoryManager();
-      renderAdminProducts();
-      searchProduct();
+      return specs;
     }
 
-    function deleteCategoryPrompt(cat){
-      if(!isAdmin) return;
-      const norm = normalizeCategory(cat);
-      if(!norm) return;
-      if(norm === "uncategorized"){
-        alert("You cannot delete 'uncategorized'.");
-        return;
-      }
-
-      const usedCount = products.filter(p => normalizeCategory(p.category) === norm).length;
-      const msg = usedCount
-        ? `This category is used by ${usedCount} product(s).\n\nIf you delete it, those products will be moved to 'uncategorized'.\n\nDelete anyway?`
-        : `Delete category '${norm}'?`;
-
-      if(!confirm(msg)) return;
-
-      // Remove from categories
-      categories = categories.filter(c => c !== norm);
-      if(!categories.includes("uncategorized")) categories.push("uncategorized");
-      categories = Array.from(new Set(categories)).sort();
-      saveCategories();
-
-      // Move products
-      products = products.map(p => {
-        if(normalizeCategory(p.category) === norm){
-          return { ...p, category: "uncategorized" };
-        }
-        return p;
-      });
-      saveProducts();
-
-      renderCategoryOptions();
-      renderAdminCategoryDropdown("uncategorized");
-      renderCategoryManager();
-      renderAdminProducts();
-      searchProduct();
+    function specsToText(specs){
+      if(!specs || typeof specs !== "object") return "";
+      return Object.entries(specs).map(([k,v])=>`${k}: ${v}`).join("\n");
     }
 
-    /* ---------- THEME TOGGLE ---------- */
+    function csvEscape(value){
+      if(value == null) return "";
+      const str = String(value);
+      if(/[",\n\r]/.test(str)) return '"' + str.replace(/"/g, '""') + '"';
+      return str;
+    }
+
+    /* ---------- THEME ---------- */
     function applyTheme(theme){
       document.body.classList.remove("dark", "light");
       document.body.classList.add(theme);
@@ -1577,7 +963,85 @@
       applyTheme(current === "dark" ? "light" : "dark");
     });
 
-    /* ---------- SEARCH + FILTER ---------- */
+    /* ---------- BACKEND LOADERS ---------- */
+    async function loadProducts(){
+      try{
+        const out = await apiGet("products");
+        if(out.ok && Array.isArray(out.data)){
+          products = out.data;
+          return;
+        }
+      }catch(e){}
+      products = DEFAULT_PRODUCTS.slice();
+    }
+
+    async function loadCategories(){
+      try{
+        const out = await apiGet("categories");
+        if(out.ok && Array.isArray(out.data)){
+          // store as plain category list
+          categories = out.data.map(x => (x.category || "").toLowerCase().trim()).filter(Boolean);
+          // fall back defaults if blank
+          if(!categories.length) categories = ["camera","converter","accessory"];
+          return;
+        }
+      }catch(e){}
+      categories = ["camera","converter","accessory"];
+    }
+
+    /* ---------- CATEGORY RENDER ---------- */
+    function renderCategoryOptions(){
+      const cats = Array.from(new Set(categories)).sort();
+      categorySelect.innerHTML = `
+        <option value="all">All Categories</option>
+        ${cats.map(c => `<option value="${c}">${formatCategoryLabel(c)}</option>`).join("")}
+      `;
+    }
+
+    function renderAdminCategoryDropdown(selectedValue = ""){
+      const selected = (selectedValue || "").trim().toLowerCase();
+      const cats = Array.from(new Set(categories)).sort();
+
+      prodCategoryInput.innerHTML = `
+        <option value="" disabled ${selected ? "" : "selected"}>Select category</option>
+        ${cats.map(c => `
+          <option value="${c}" ${c === selected ? "selected" : ""}>${formatCategoryLabel(c)}</option>
+        `).join("")}
+        <option value="__add_new__">+ Add new category...</option>
+      `;
+    }
+
+    // Add-new category -> backend
+    prodCategoryInput.addEventListener("change", async (e)=>{
+      if(e.target.value !== "__add_new__") return;
+
+      let newCat = prompt("Enter new category name (e.g. switcher, mic, tripod):", "");
+      if(!newCat){
+        renderAdminCategoryDropdown();
+        return;
+      }
+      newCat = newCat.trim().toLowerCase();
+      if(!newCat){
+        renderAdminCategoryDropdown();
+        return;
+      }
+
+      // upsert to backend
+      const out = await apiPost({ action:"upsert_category", category: { category: newCat, label: formatCategoryLabel(newCat) }});
+      if(!out.ok){
+        alert("Failed to add category: " + (out.error || "Unknown error"));
+        renderAdminCategoryDropdown();
+        return;
+      }
+
+      // refresh from backend so everyone matches
+      await loadCategories();
+      renderCategoryOptions();
+      renderAdminCategoryDropdown(newCat);
+      searchProduct();
+    });
+
+    /* ---------- SEARCH ---------- */
     function searchProduct(){
       const query = searchInput.value.trim().toLowerCase();
       const selectedCategory = categorySelect.value;
@@ -1593,7 +1057,7 @@
           const brand = (p.brand || "").toLowerCase();
           const matchesText = !query || model.includes(query) || name.includes(query) || brand.includes(query);
 
-          const pCat = normalizeCategory(p.category);
+          const pCat = (p.category || "").trim().toLowerCase();
           const matchesCategory = (selectedCategory === "all") || (pCat === selectedCategory);
 
           return matchesText && matchesCategory;
@@ -1612,16 +1076,16 @@
           card.className = "result-card";
 
           const isChecked = compareSelection.includes(product.model);
-          const catLabel = formatCategoryLabel(product.category || "");
+          const catLabel = (product.category || "").toUpperCase();
 
           card.innerHTML = `
             <div class="result-header">
               <div>
                 <p class="result-model">Model: ${product.model}</p>
-                <h2 class="result-name">${product.name || "-"}</h2>
+                <h2 class="result-name">${product.name || ""}</h2>
                 <p class="result-meta">
                   <strong>Brand:</strong> ${product.brand || "-"}
-                  <span class="chip">${catLabel || "Uncategorized"}</span>
+                  <span class="chip">${catLabel}</span>
                 </p>
               </div>
               <div class="result-actions">
@@ -1633,14 +1097,14 @@
               </div>
             </div>
             <p class="result-description">${product.description || ""}</p>
-            ${product.image ? `<img class="result-image" src="${product.image}" alt="${(product.name||product.model).replace(/"/g,"&quot;")}">` : ""}
+            ${product.image ? `<img class="result-image" src="${product.image}" alt="${product.name || ""}">` : ""}
           `;
 
           resultsContainer.appendChild(card);
         });
 
         renderCompare();
-      }, 180);
+      }, 220);
     }
 
     searchButton.addEventListener("click", searchProduct);
@@ -1692,15 +1156,15 @@
         <table class="compare-table">
           <tr>
             <th>Feature</th>
-            ${selectedProducts.map(p=>`<th>${p.name || "-"}</th>`).join("")}
+            ${selectedProducts.map(p=>`<th>${p.name || ""}</th>`).join("")}
           </tr>
           <tr>
             <th>Image</th>
-            ${selectedProducts.map(p=>`<td>${p.image ? `<img class="compare-image" src="${p.image}" alt="${(p.name||p.model).replace(/"/g,"&quot;")}">` : "-"}</td>`).join("")}
+            ${selectedProducts.map(p=>`<td>${p.image ? `<img class="compare-image" src="${p.image}" alt="${p.name || ""}">` : "-"}</td>`).join("")}
           </tr>
           <tr>
             <th>Model</th>
-            ${selectedProducts.map(p=>`<td>${p.model}</td>`).join("")}
+            ${selectedProducts.map(p=>`<td>${p.model || ""}</td>`).join("")}
           </tr>
           <tr>
             <th>Brand</th>
@@ -1708,7 +1172,7 @@
           </tr>
           <tr>
             <th>Category</th>
-            ${selectedProducts.map(p=>`<td>${formatCategoryLabel(p.category || "")}</td>`).join("")}
+            ${selectedProducts.map(p=>`<td>${(p.category || "").toUpperCase()}</td>`).join("")}
           </tr>
           <tr>
             <th>Description</th>
@@ -1797,9 +1261,7 @@
                     onchange="updateCartQuantity('${item.model}', this.value)" />
                 </div>
 
-                <button class="remove-cart-btn" onclick="removeFromCart('${item.model}')">
-                  Remove
-                </button>
+                <button class="remove-cart-btn" onclick="removeFromCart('${item.model}')">Remove</button>
               </div>
             </div>
           `).join("")}
@@ -1807,271 +1269,52 @@
       `;
     }
 
-    /* ---------- CSV HELPERS ---------- */
-    function csvEscape(value){
-      if(value == null) return "";
-      const str = String(value);
-      if(/[",\n\r]/.test(str)) return '"' + str.replace(/"/g, '""') + '"';
-      return str;
-    }
-
-    function peso0(){
-      // keep as plain 0.00 (safer for CSV import); user can format as currency in Excel
-      return "0.00";
-    }
-
-    function todayISO(){
-      const d = new Date();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth()+1).padStart(2,"0");
-      const dd = String(d.getDate()).padStart(2,"0");
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
-    /* ---------- BOQ / ESTIMATED WORKSHEET EXPORT ---------- */
-    function downloadQuotationBOQ(){
+    function downloadQuotation(){
       if(cart.length === 0){
-        alert("Cart is empty. Add products before generating a BOQ CSV.");
+        alert("Cart is empty. Add products before generating a quotation.");
         return;
       }
 
-      // Header fields
-      const meta = {
-        client: (qClient.value || "").trim(),
-        location: (qLocation.value || "").trim(),
-        dateToday: (qDateToday.value || "").trim() || todayISO(),
-        contact: (qContact.value || "").trim(),
-        phoneEmail: (qPhoneEmail.value || "").trim(),
-        project: (qProject.value || "").trim(),
-        accountExec: (qAccountExec.value || "").trim(),
-        engineer: (qEngineer.value || "").trim(),
-        ews: (qEwsControl.value || "").trim(),
-        notes: (qNotes.value || "").trim()
-      };
-
       const rows = [];
+      rows.push(["Brand","Model","Description","Quantity"]);
 
-      // --- Title + Header area (keeps "blank spaces" feel)
-      rows.push(["ESTIMATED WORKSHEET"]);
-      rows.push([]);
-      rows.push(["CLIENT", meta.client, "", "Location", meta.location, "", "Date Today:", meta.dateToday]);
-      rows.push(["CONTACT", meta.contact, "", "Account Executive:", meta.accountExec]);
-      rows.push(["Phone/Fax-Email", meta.phoneEmail, "", "Av Design Engineer:", meta.engineer]);
-      rows.push(["Project/Type/Name", meta.project, "", "EWS Control No.", meta.ews]);
-      if(meta.notes){
-        rows.push(["Notes", meta.notes]);
-      }
-      rows.push([]);
-      rows.push([]);
-
-      // --- MAIN I
-      rows.push(["MAIN I - EQUIPMENT / HARDWARE PRODUCTS"]);
-      rows.push(["Item","Brand","Part #","Model","Specification","Qty","UOM","COST","TOTAL COST","Price or Mark Up Level"]);
-      rows.push(["(Room Name)"]);
-      // cart items
-      let itemNo = 1;
-      cart.forEach(ci=>{
-        const p = products.find(pp=>pp.model === ci.model);
-        const brand = (p && p.brand) ? p.brand : (ci.brand || "");
-        const model = ci.model || "";
-        const spec = (p && (p.description || p.name)) ? (p.description || p.name) : (ci.description || ci.name || "");
-        const qty = ci.quantity || 0;
+      cart.forEach(item=>{
         rows.push([
-          String(itemNo++),
-          brand,
-          "",                 // Part # blank
-          model,
-          spec,
-          String(qty),
-          "unit(s)",
-          peso0(),
-          peso0(),
-          ""
+          csvEscape(item.brand || ""),
+          csvEscape(item.model),
+          csvEscape(item.description),
+          csvEscape(item.quantity)
         ]);
       });
 
-      rows.push([]);
-      rows.push(["Sub Total-for Equipment/Hardware Products A", "", "", "", "", "", "", peso0()]);
-      rows.push([]);
-      rows.push(["Sub Total-for Licenses/Non-Tangible Products B", "", "", "", "", "", "", peso0()]);
-      rows.push([]);
-      rows.push(["Total Main I: A & B", "", "", "", "", "", "", peso0()]);
-      rows.push([]);
-      rows.push([]);
-
-      // --- MAIN II placeholder (kept intentionally NOT auto-filled)
-      rows.push(["MAIN II - GENERAL SERVICES"]);
-      rows.push(["(Manpower / SI Materials / Other Expenses are not auto-filled by the inventory tool.)"]);
-      rows.push([]);
-      rows.push(["LABOR/MANPOWER EXPENSE"]);
-      rows.push(["(Fill this section in your official workbook as needed.)"]);
-      rows.push([]);
-      rows.push(["OTHER EXPENSES"]);
-      rows.push(["(Fill this section in your official workbook as needed.)"]);
-      rows.push([]);
-      rows.push([]);
-
-      // --- MAIN III placeholder
-      rows.push(["MAIN III - MISCELLANEOUS COMPULSORY ALLOCATION"]);
-      rows.push(["(Fill this section in your official workbook as needed.)"]);
-      rows.push([]);
-      rows.push(["GRAND TOTAL (Main I, II & III)", "", "", "", "", "", "", peso0()]);
-      rows.push([]);
-
-      const csvContent = rows.map(r => r.map(csvEscape).join(",")).join("\r\n");
+      const csvContent = rows.map(r=>r.join(",")).join("\r\n");
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
+      const today = new Date().toISOString().slice(0,10);
       link.href = url;
-
-      const safeClient = (meta.client || "client").replace(/[^\w\-]+/g,"_").slice(0,40);
-      link.download = `Estimated_Worksheet_${safeClient}_${todayISO()}.csv`;
-
+      link.download = `quotation_${today}.csv`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     }
 
-    /* ---------- SPECS HELPERS ---------- */
-    function parseSpecsFromString(text){
-      const specs = {};
-      if(!text) return specs;
-      text.split(/\r?\n/).forEach(line=>{
-        const trimmed = line.trim();
-        if(!trimmed) return;
-        const [key, ...rest] = trimmed.split(":");
-        const value = rest.join(":").trim();
-        if(key) specs[key.trim()] = value || "";
-      });
-      return specs;
-    }
-
-    function specsToText(specs){
-      if(!specs || typeof specs !== "object") return "";
-      return Object.entries(specs).map(([k,v])=>`${k}: ${v}`).join("\n");
-    }
-
-    /* ---------- DUPLICATE DETECTION ---------- */
-    function normalizeModel(m){
-      return (m || "").trim().toLowerCase();
-    }
-
-    function normalizeName(n){
-      return (n || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").replace(/\s+/g," ").trim();
-    }
-
-    // Dice coefficient over bigrams: fast + good enough
-    function diceSimilarity(a, b){
-      a = normalizeName(a);
-      b = normalizeName(b);
-      if(!a || !b) return 0;
-      if(a === b) return 1;
-
-      function bigrams(s){
-        const out = [];
-        const str = ` ${s} `;
-        for(let i=0;i<str.length-1;i++){
-          out.push(str.slice(i,i+2));
-        }
-        return out;
+    /* ---------- SUGGESTIONS (still local) ---------- */
+    function loadSuggestions(){
+      try{
+        const raw = localStorage.getItem(SUGGESTIONS_STORAGE_KEY);
+        if(raw) suggestions = JSON.parse(raw) || [];
+      }catch(e){
+        suggestions = [];
       }
-
-      const ab = bigrams(a);
-      const bb = bigrams(b);
-      const map = new Map();
-      ab.forEach(x => map.set(x, (map.get(x)||0)+1));
-      let hits = 0;
-      bb.forEach(x=>{
-        const c = map.get(x)||0;
-        if(c>0){
-          hits++;
-          map.set(x, c-1);
-        }
-      });
-
-      return (2 * hits) / (ab.length + bb.length);
+      renderSuggestions();
     }
 
-    function findDuplicateWarnings({ model, name, editingIndex }){
-      const warnings = [];
-      const m = normalizeModel(model);
-      const n = (name || "").trim();
-
-      if(m){
-        const sameModelIndex = products.findIndex((p, idx)=>{
-          if(editingIndex != null && idx === editingIndex) return false;
-          return normalizeModel(p.model) === m;
-        });
-
-        if(sameModelIndex !== -1){
-          const p = products[sameModelIndex];
-          warnings.push(`⚠️ Same model already exists: <b>${p.model}</b> (${p.brand || "-"} • ${p.name || "-"})`);
-        }
-      }
-
-      if(n){
-        const candidates = products
-          .map((p, idx)=>({ p, idx }))
-          .filter(x => (editingIndex == null) || (x.idx !== editingIndex))
-          .filter(x => (x.p && x.p.name))
-          .map(x => ({
-            idx: x.idx,
-            model: x.p.model,
-            brand: x.p.brand || "-",
-            name: x.p.name || "-",
-            score: diceSimilarity(n, x.p.name || "")
-          }))
-          .filter(x => x.score >= 0.78)
-          .sort((a,b)=>b.score-a.score)
-          .slice(0, 4);
-
-        if(candidates.length){
-          warnings.push(`⚠️ Similar product name found:`);
-          candidates.forEach(c=>{
-            warnings.push(`• <b>${c.name}</b> (Model: ${c.model}, Brand: ${c.brand}) — similarity ${(c.score*100).toFixed(0)}%`);
-          });
-        }
-      }
-
-      return warnings;
+    function saveSuggestions(){
+      localStorage.setItem(SUGGESTIONS_STORAGE_KEY, JSON.stringify(suggestions));
     }
 
-    function showAdminWarnings(lines){
-      if(!lines || !lines.length){
-        adminWarningsEl.style.display = "none";
-        adminWarningsEl.innerHTML = "";
-        return;
-      }
-      adminWarningsEl.style.display = "block";
-      adminWarningsEl.innerHTML = lines.join("<br>");
-    }
-
-    function clearAdminWarnings(){
-      showAdminWarnings([]);
-    }
-
-    /* Live warnings while typing */
-    prodModelInput.addEventListener("input", ()=>{
-      if(!isAdmin) return;
-      const lines = findDuplicateWarnings({
-        model: prodModelInput.value,
-        name: prodNameInput.value,
-        editingIndex: editingProductIndex
-      });
-      showAdminWarnings(lines);
-    });
-    prodNameInput.addEventListener("input", ()=>{
-      if(!isAdmin) return;
-      const lines = findDuplicateWarnings({
-        model: prodModelInput.value,
-        name: prodNameInput.value,
-        editingIndex: editingProductIndex
-      });
-      showAdminWarnings(lines);
-    });
-
-    /* ---------- SUGGESTIONS ---------- */
     function renderSuggestions(){
       if(!suggestions.length){
         suggestionsListEl.innerHTML = "";
@@ -2086,9 +1329,9 @@
           <div class="suggestion-card-header">
             <span>${s.brand || "-"} • ${s.model || "-"}</span>
             ${isAdmin ? `
-              <span class="suggestion-admin-buttons">
-                <button type="button" onclick="approveSuggestion(${index})">Approve</button>
-                <button type="button" onclick="deleteSuggestion(${index})">Delete</button>
+              <span>
+                <button type="button" class="admin-product-actions-btn" onclick="approveSuggestion(${index})">Approve</button>
+                <button type="button" class="admin-product-actions-btn" onclick="deleteSuggestion(${index})">Delete</button>
               </span>
             ` : ""}
           </div>
@@ -2167,26 +1410,15 @@
       }
     }
 
-    function approveSuggestion(index){
+    async function approveSuggestion(index){
       if(!isAdmin){ alert("Admin only."); return; }
       const s = suggestions[index];
       if(!s) return;
 
       const defaultName = (s.name || `${s.brand || ""} ${s.model || ""}`).trim();
-
-      // choose category from categories list
-      let category = prompt(
-        "Enter category for this product (must match an existing category OR type a new one):",
-        "converter"
-      );
-      if(!category) category = "uncategorized";
-      category = normalizeCategory(category);
-
-      if(!categories.includes(category)){
-        categories.push(category);
-        categories.sort();
-        saveCategories();
-      }
+      let category = prompt("Enter category:", "converter");
+      if(!category) category = "converter";
+      category = category.toLowerCase().trim();
 
       const image = prompt("Enter image URL for this product (optional):", "") || "";
       const specsText = prompt("Enter basic specs (optional, one per line as 'Key: Value'):", "");
@@ -2207,28 +1439,37 @@
         return;
       }
 
-      const existingIndex = products.findIndex(p=>normalizeModel(p.model) === normalizeModel(newProduct.model));
-      if(existingIndex !== -1){
-        if(!confirm("A product with this model already exists (case-insensitive match). Replace it?")) return;
-        products[existingIndex] = newProduct;
-      }else{
-        products.push(newProduct);
+      // Duplicate detection for approvals too
+      const existingModel = products.find(p => (p.model||"").trim().toLowerCase() === newProduct.model.trim().toLowerCase());
+      if(existingModel && !confirm(`Same model already exists (${existingModel.model}). Replace it?`)){
+        return;
       }
 
-      saveProducts();
-      syncCategoriesFromProducts();
+      const similar = products.find(p => isSimilarName(p.name || "", newProduct.name || ""));
+      if(similar){
+        const ok = confirm(`Similar name found:\n- Existing: ${similar.name}\n- New: ${newProduct.name}\n\nContinue anyway?`);
+        if(!ok) return;
+      }
+
+      const out = await apiPost({ action:"upsert_product", product: newProduct });
+      if(!out.ok){
+        alert("Failed to save product: " + (out.error || "Unknown error"));
+        return;
+      }
+
       suggestions.splice(index, 1);
       saveSuggestions();
 
+      await loadProducts();
+      await loadCategories();
       renderCategoryOptions();
-      renderAdminCategoryDropdown();
-      renderCategoryManager();
+      renderAdminCategoryDropdown(newProduct.category);
       renderSuggestions();
       renderAdminProducts();
       searchProduct();
     }
 
-    /* ---------- ADMIN PRODUCT MANAGEMENT ---------- */
+    /* ---------- ADMIN PRODUCT MANAGEMENT (backend) ---------- */
     function renderAdminProducts(){
       if(!isAdmin){
         adminProductsList.innerHTML = `
@@ -2249,9 +1490,9 @@
       const rowsHtml = products.map((p, index)=>`
         <tr>
           <td>${p.brand || "-"}</td>
-          <td>${p.model}</td>
+          <td>${p.model || ""}</td>
           <td>${p.name || ""}</td>
-          <td>${formatCategoryLabel(p.category || "uncategorized")}</td>
+          <td>${(p.category || "").toUpperCase()}</td>
           <td>
             <button type="button" class="admin-product-actions-btn" onclick="startEditProduct(${index})">Edit</button>
             <button type="button" class="admin-product-actions-btn" onclick="deleteProduct(${index})">Delete</button>
@@ -2272,29 +1513,24 @@
         </table>`;
     }
 
-    productForm.addEventListener("submit", (event)=>{
+    productForm.addEventListener("submit", async (event)=>{
       event.preventDefault();
       if(!isAdmin){ alert("Admin only."); return; }
 
       const brand = prodBrandInput.value.trim();
       const model = prodModelInput.value.trim();
       const name = prodNameInput.value.trim();
-      let category = normalizeCategory(prodCategoryInput.value || "");
+      let category = (prodCategoryInput.value || "").trim().toLowerCase();
       const image = prodImageInput.value.trim();
       const description = prodDescriptionInput.value.trim();
       const specsText = prodSpecsInput.value.trim();
       const specs = parseSpecsFromString(specsText);
 
       if(!model){ alert("Model is required."); return; }
-      if(!category) category = "uncategorized";
-      if(!categories.includes(category)){
-        categories.push(category);
-        categories.sort();
-        saveCategories();
-      }
+      if(!category || category === "__add_new__"){ alert("Please select a category."); return; }
 
       const productData = {
-        model: model.trim(),
+        model,
         brand,
         name: name || `${brand} ${model}`.trim() || "New Product",
         category,
@@ -2303,51 +1539,47 @@
         specs
       };
 
-      // ✅ Duplicate warnings -> confirm before saving
-      const warnLines = findDuplicateWarnings({
-        model: productData.model,
-        name: productData.name,
-        editingIndex: editingProductIndex
-      });
-
-      if(warnLines.length){
-        showAdminWarnings(warnLines);
-        const proceed = confirm(
-          "Duplicate / Similar item detected.\n\nDo you want to continue saving this product?"
-        );
-        if(!proceed) return;
-      }
-
-      // Same-model replace (case-insensitive) logic
+      // Duplicate detection: same model
+      const modelLower = model.trim().toLowerCase();
       const existingIndex = products.findIndex((p, idx)=>{
-        if(editingProductIndex != null && idx === editingProductIndex) return false;
-        return normalizeModel(p.model) === normalizeModel(productData.model);
+        const pModel = String(p.model||"").trim().toLowerCase();
+        if(editingProductIndex !== null && idx === editingProductIndex) return false; // ignore self
+        return pModel === modelLower;
       });
-
-      if(editingProductIndex !== null){
-        // editing existing row
-        products[editingProductIndex] = productData;
-      }else if(existingIndex !== -1){
-        // add mode but model exists -> ask to replace
-        const ok = confirm("Same model already exists (case-insensitive). Replace the existing product?");
+      if(existingIndex !== -1){
+        const existing = products[existingIndex];
+        const ok = confirm(`Same MODEL exists already:\n${existing.model} - ${existing.name}\n\nReplace/overwrite it?`);
         if(!ok) return;
-        products[existingIndex] = productData;
-      }else{
-        products.push(productData);
       }
 
-      saveProducts();
-      syncCategoriesFromProducts();
+      // Duplicate detection: similar name
+      const similar = products.find((p, idx)=>{
+        if(editingProductIndex !== null && idx === editingProductIndex) return false; // ignore self
+        return isSimilarName(p.name || "", productData.name || "");
+      });
+      if(similar){
+        const ok = confirm(`Similar NAME found:\n- Existing: ${similar.name}\n- New: ${productData.name}\n\nContinue anyway?`);
+        if(!ok) return;
+      }
+
+      // Save to backend
+      const out = await apiPost({ action:"upsert_product", product: productData });
+      if(!out.ok){
+        alert("Failed to save product: " + (out.error || "Unknown error"));
+        return;
+      }
+
+      // Refresh lists
+      await loadProducts();
+      await loadCategories();
 
       productForm.reset();
       editingProductIndex = null;
       productFormSubmitBtn.textContent = "Add product";
       productFormCancelEditBtn.style.display = "none";
-      clearAdminWarnings();
 
       renderCategoryOptions();
       renderAdminCategoryDropdown();
-      renderCategoryManager();
       renderAdminProducts();
       searchProduct();
     });
@@ -2361,7 +1593,7 @@
       prodBrandInput.value = p.brand || "";
       prodModelInput.value = p.model || "";
       prodNameInput.value = p.name || "";
-      renderAdminCategoryDropdown(p.category || "uncategorized");
+      renderAdminCategoryDropdown(p.category || "");
       prodImageInput.value = p.image || "";
       prodDescriptionInput.value = p.description || "";
       prodSpecsInput.value = specsToText(p.specs);
@@ -2369,39 +1601,34 @@
       productFormSubmitBtn.textContent = "Save changes";
       productFormCancelEditBtn.style.display = "inline-block";
 
-      // update warnings for edit context
-      const lines = findDuplicateWarnings({
-        model: prodModelInput.value,
-        name: prodNameInput.value,
-        editingIndex: editingProductIndex
-      });
-      showAdminWarnings(lines);
-
       window.scrollTo({ top: document.getElementById("adminSection").offsetTop, behavior: "smooth" });
     }
 
-    function deleteProduct(index){
+    async function deleteProduct(index){
       if(!isAdmin) return;
       const p = products[index];
       if(!p) return;
       if(!confirm(`Delete product ${p.model}?`)) return;
 
-      const model = p.model;
-      products.splice(index, 1);
-      saveProducts();
+      const out = await apiPost({ action:"delete_product", model: p.model });
+      if(!out.ok){
+        alert("Failed to delete: " + (out.error || "Unknown error"));
+        return;
+      }
 
-      compareSelection = compareSelection.filter(m=>m !== model);
-      cart = cart.filter(item=>item.model !== model);
+      // cleanup local selections
+      compareSelection = compareSelection.filter(m=>m !== p.model);
+      cart = cart.filter(item=>item.model !== p.model);
 
-      syncCategoriesFromProducts();
+      await loadProducts();
+      await loadCategories();
+
       renderCategoryOptions();
       renderAdminCategoryDropdown();
-      renderCategoryManager();
       renderAdminProducts();
       renderCart();
       renderCompare();
       searchProduct();
-      clearAdminWarnings();
     }
 
     function cancelProductEdit(){
@@ -2409,7 +1636,6 @@
       productForm.reset();
       productFormSubmitBtn.textContent = "Add product";
       productFormCancelEditBtn.style.display = "none";
-      clearAdminWarnings();
       renderAdminCategoryDropdown();
     }
 
@@ -2426,7 +1652,6 @@
       }
       renderSuggestions();
       renderAdminProducts();
-      renderCategoryManager();
     }
 
     adminLoginForm.addEventListener("submit", (event)=>{
@@ -2446,7 +1671,6 @@
       isAdmin = false;
       sessionStorage.removeItem(ADMIN_SESSION_KEY);
       updateAdminUI();
-      clearAdminWarnings();
     }
 
     function initAdmin(){
@@ -2456,38 +1680,38 @@
     }
 
     /* ---------- INIT ---------- */
-    loadProducts();
-    loadCategories();
-    renderCategoryOptions();
-    renderAdminCategoryDropdown("uncategorized");
-    loadSuggestions();
-    initAdmin();
-    searchProduct();
+    (async function init(){
+      // Load from backend first
+      await loadProducts();
+      await loadCategories();
 
-    // default Date Today field
-    qDateToday.value = todayISO();
+      // Render dropdowns
+      renderCategoryOptions();
+      renderAdminCategoryDropdown();
 
-    // expose globals used in inline handlers
+      // Local-only suggestions + admin
+      loadSuggestions();
+      initAdmin();
+
+      // initial search
+      searchProduct();
+    })();
+
+    // expose for inline onclick
     window.toggleCompare = toggleCompare;
     window.clearCompare = clearCompare;
     window.addToCart = addToCart;
     window.removeFromCart = removeFromCart;
     window.updateCartQuantity = updateCartQuantity;
-    window.downloadQuotationBOQ = downloadQuotationBOQ;
-
+    window.downloadQuotation = downloadQuotation;
     window.copySuggestions = copySuggestions;
     window.deleteSuggestion = deleteSuggestion;
     window.clearAllSuggestions = clearAllSuggestions;
     window.approveSuggestion = approveSuggestion;
-
     window.startEditProduct = startEditProduct;
     window.deleteProduct = deleteProduct;
     window.cancelProductEdit = cancelProductEdit;
     window.adminLogout = adminLogout;
-
-    window.addCategoryFromManager = addCategoryFromManager;
-    window.renameCategoryPrompt = renameCategoryPrompt;
-    window.deleteCategoryPrompt = deleteCategoryPrompt;
   </script>
 </body>
 </html>
