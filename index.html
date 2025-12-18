@@ -1,4 +1,1925 @@
-d. Check deployment permissions / access.");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Product Inventory Search</title>
+
+  <style>
+    :root{
+      --bg0:#05040a;
+      --bg1:#09071a;
+      --panel: rgba(10, 10, 18, 0.72);
+      --panel2: rgba(15, 15, 28, 0.72);
+      --border: rgba(160, 255, 255, 0.22);
+
+      --text:#e9f7ff;
+      --muted: rgba(233, 247, 255, 0.7);
+
+      --neon-cyan:#25f6ff;
+      --neon-pink:#ff2bd6;
+      --neon-purple:#9b5cff;
+      --neon-green:#31ff8b;
+
+      --shadow: 0 10px 40px rgba(0,0,0,.55);
+      --glow-cyan: 0 0 12px rgba(37,246,255,.45);
+      --glow-pink: 0 0 12px rgba(255,43,214,.35);
+      --glow-purple: 0 0 14px rgba(155,92,255,.35);
+
+      --radius: 14px;
+    }
+
+    body.light{
+      --bg0:#f3f7ff;
+      --bg1:#ffffff;
+      --panel: rgba(255,255,255,.78);
+      --panel2: rgba(245,248,255,.85);
+      --border: rgba(20, 40, 60, 0.18);
+
+      --text:#0c1120;
+      --muted: rgba(12, 17, 32, 0.65);
+
+      --shadow: 0 12px 30px rgba(10, 20, 40, .12);
+      --glow-cyan: 0 0 12px rgba(37,246,255,.25);
+      --glow-pink: 0 0 12px rgba(255,43,214,.18);
+      --glow-purple: 0 0 12px rgba(155,92,255,.20);
+    }
+
+    * { box-sizing: border-box; }
+
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 16px;
+      background: radial-gradient(1200px 700px at 20% -10%, rgba(37,246,255,.16), transparent 55%),
+                  radial-gradient(900px 600px at 110% 10%, rgba(255,43,214,.12), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      color: var(--text);
+      transition: background .3s ease, color .3s ease;
+      overflow-x: hidden;
+    }
+
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.03),
+          rgba(255,255,255,0.03) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      opacity: .18;
+      mix-blend-mode: overlay;
+      z-index: 0;
+    }
+
+    body::after{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+      opacity: .05;
+      z-index: 0;
+    }
+
+    header, main, aside, section { position: relative; z-index: 1; }
+
+    body.dark { color-scheme: dark; }
+    body.light { color-scheme: light; }
+
+    /* Better select readability */
+    body.dark select{
+      background: linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92));
+      color: var(--text);
+      border: 1px solid rgba(37,246,255,.25);
+    }
+    body.dark select option{
+      background: #0b0f1a;
+      color: #e9f7ff;
+    }
+
+    body.light select{
+      background: rgba(255,255,255,.92);
+      color: #0c1120;
+      border: 1px solid rgba(20,40,60,.18);
+    }
+    body.light select option{
+      background: #ffffff;
+      color: #0c1120;
+    }
+
+    .sticky-header{
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,0));
+      backdrop-filter: blur(10px);
+      padding-top: 10px;
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .top-bar{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .glitch{
+      position: relative;
+      display: inline-block;
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: var(--glow-cyan), var(--glow-pink);
+    }
+
+    .theme-toggle{
+      padding: 10px 14px;
+      font-size: 13px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(37,246,255,.18), rgba(255,43,214,.12));
+      color: var(--text);
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: var(--shadow);
+      transition: transform .12s ease, box-shadow .12s ease, border-color .2s ease, filter .2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .theme-toggle:hover{
+      transform: translateY(-1px);
+      border-color: rgba(37,246,255,.55);
+      box-shadow: var(--shadow), var(--glow-cyan);
+      filter: brightness(1.05);
+    }
+
+    .search-box{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .search-box input,
+    .search-box select,
+    .suggestion-form input,
+    .suggestion-form textarea,
+    .admin-login-form input,
+    .admin-product-form input,
+    .admin-product-form select,
+    .admin-product-form textarea,
+    .quote-meta input,
+    .quote-meta textarea{
+      padding: 10px 12px;
+      font-size: 15px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      color: var(--text);
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+      transition: border-color .2s ease, box-shadow .2s ease, transform .12s ease;
+    }
+
+    .search-box input{ flex: 1 1 260px; }
+    .search-box select{ flex: 0 0 210px; cursor: pointer; }
+
+    .search-box button,
+    .suggestion-form button,
+    .admin-login-form button,
+    .admin-product-form button,
+    .admin-btn{
+      padding: 10px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(135deg, rgba(37,246,255,.22), rgba(155,92,255,.18)),
+        radial-gradient(300px 120px at 20% 30%, rgba(255,43,214,.25), transparent 55%);
+      color: var(--text);
+      box-shadow: var(--shadow), var(--glow-cyan);
+      transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .search-box button:hover,
+    .suggestion-form button:hover,
+    .admin-login-form button:hover,
+    .admin-product-form button:hover,
+    .admin-btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+      box-shadow: var(--shadow), var(--glow-cyan), var(--glow-pink);
+    }
+
+    .layout{
+      display: grid;
+      grid-template-columns: 1fr 460px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .sidebar{
+      position: sticky;
+      top: 140px;
+      align-self: start;
+      max-height: calc(100vh - 160px);
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    @media (max-width: 900px){
+      .layout{ grid-template-columns: 1fr; }
+      .sidebar{
+        position: static;
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
+      }
+    }
+
+    .result-card{
+      border: 1px solid transparent;
+      border-radius: 14px;
+      background:
+        linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
+        linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
+      background-size: 100% 100%, 300% 300%;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow:
+        0 0 0 1px rgba(37,246,255,.2),
+        0 10px 30px rgba(0,0,0,.55);
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeIn 0.35s forwards, neonShift 10s linear infinite;
+    }
+    @keyframes neonShift {
+      0%   { background-position: 0% 50%, 0% 50%; }
+      50%  { background-position: 0% 50%, 100% 50%; }
+      100% { background-position: 0% 50%, 0% 50%; }
+    }
+    .result-card:hover{
+      box-shadow:
+        0 0 0 1px rgba(37,246,255,.4),
+        0 0 20px rgba(37,246,255,.25),
+        0 0 26px rgba(255,43,214,.2),
+        0 12px 36px rgba(0,0,0,.6);
+      transform: translateY(-2px);
+      transition: transform .12s ease;
+    }
+
+    .result-header{
+      display:flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .result-model{
+      margin: 0 0 6px;
+      font-size: 12px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .result-name{
+      margin: 0 0 6px;
+      font-size: 18px;
+      letter-spacing: .3px;
+      text-shadow: var(--glow-cyan);
+    }
+
+    .result-meta{
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .chip{
+      display:inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(37,246,255,.25);
+      background: rgba(37,246,255,.08);
+      box-shadow: var(--glow-cyan);
+      font-size: 12px;
+      margin-left: 6px;
+      color: var(--text);
+    }
+
+    .result-description{
+      margin: 10px 0 0;
+      color: rgba(233,247,255,.86);
+      line-height: 1.45;
+    }
+
+    .result-image{
+      margin-top: 14px;
+      max-width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 12px 35px rgba(0,0,0,.55);
+    }
+
+    .result-actions{
+      display:flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      min-width: 120px;
+    }
+
+    .compare-toggle{
+      font-size: 13px;
+      display:flex;
+      align-items:center;
+      gap: 6px;
+      cursor:pointer;
+      user-select:none;
+      color: rgba(233,247,255,.9);
+    }
+
+    .add-cart-btn{
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,43,214,.28);
+      background: linear-gradient(135deg, rgba(255,43,214,.22), rgba(37,246,255,.16));
+      color: var(--text);
+      cursor:pointer;
+      box-shadow: var(--glow-pink);
+      transition: transform .12s ease, filter .2s ease;
+      white-space: nowrap;
+    }
+    .add-cart-btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+
+    @keyframes fadeIn{ to{ opacity:1; transform: translateY(0); } }
+
+    .loader{
+      border: 6px solid rgba(255,255,255,.18);
+      border-top: 6px solid var(--neon-cyan);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+      box-shadow: var(--glow-cyan);
+    }
+    @keyframes spin { to { transform: rotate(360deg);} }
+
+    .no-result{
+      margin-top: 10px;
+      color: var(--neon-pink);
+      font-weight: 700;
+      display:none;
+      text-shadow: var(--glow-pink);
+    }
+
+    /* Cart frame */
+    .neon-frame{
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(12,16,26,.92), rgba(7,9,14,.92)) padding-box,
+        linear-gradient(135deg, #25f6ff, #ff2bd6, #9b5cff, #25f6ff) border-box;
+      background-size: 100% 100%, 300% 300%;
+      animation: neonShift 10s linear infinite;
+      box-shadow:
+        0 0 0 1px rgba(37,246,255,.2),
+        0 10px 30px rgba(0,0,0,.55);
+    }
+
+    /* FIX: prevent overlap bleed */
+    #cartSection{
+      padding: 14px;
+      border-radius: var(--radius);
+      display: none;
+      position: relative;
+      overflow: hidden; /* prevents pseudo elements from bleeding outside */
+    }
+
+    .cart-actions{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .cart-count{
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .download-quote-btn{
+      padding: 10px 14px;
+      font-size: 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(49,255,139,.25);
+      background: linear-gradient(135deg, rgba(49,255,139,.18), rgba(37,246,255,.10));
+      color: var(--text);
+      cursor:pointer;
+      box-shadow: 0 0 14px rgba(49,255,139,.25);
+      white-space: nowrap;
+      transition: transform .12s ease, filter .2s ease;
+    }
+    .download-quote-btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+
+    .quote-meta{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0 12px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.10));
+    }
+    .quote-meta textarea{ grid-column: 1 / -1; min-height: 70px; resize: vertical; }
+    .quote-meta .full{ grid-column: 1 / -1; }
+
+    .cart-list{
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cart-item{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.12));
+      box-shadow: 0 14px 35px rgba(0,0,0,.45);
+      padding: 12px;
+      position: relative;
+      overflow: hidden; /* keep glow inside */
+    }
+
+    .cart-item::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: conic-gradient(from 0deg,
+        rgba(255,43,214,.0),
+        rgba(255,43,214,.55),
+        rgba(37,246,255,.55),
+        rgba(155,92,255,.55),
+        rgba(255,43,214,.0)
+      );
+      filter: blur(12px);
+      opacity: .14;
+      animation: neonBorder 5.2s linear infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .cart-item::before{
+      content:"";
+      position:absolute;
+      inset: 1px;
+      background: linear-gradient(180deg, rgba(0,0,0,.24), rgba(0,0,0,.12));
+      border-radius: 12px;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .cart-item > *{ position: relative; z-index: 1; }
+    @keyframes neonBorder{ to{ transform: rotate(360deg); } }
+
+    .cart-top{
+      display:flex;
+      justify-content: space-between;
+      align-items:flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .cart-title{
+      display:flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .cart-title .brand{
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .45px;
+      color: var(--muted);
+    }
+    .cart-title .model{
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .3px;
+      text-shadow: var(--glow-cyan);
+      word-break: break-word;
+    }
+
+    .cart-desc{
+      font-size: 13px;
+      color: rgba(233,247,255,.86);
+      line-height: 1.45;
+      margin: 6px 0 10px;
+      word-break: break-word;
+    }
+
+    .cart-controls{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .qty-wrap{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .cart-item input[type="number"]{
+      width: 90px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(37,246,255,.20);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline: none;
+    }
+
+    .remove-cart-btn{
+      padding: 7px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,43,214,.26);
+      background: rgba(255,43,214,.10);
+      color: var(--text);
+      cursor:pointer;
+      box-shadow: var(--glow-pink);
+      transition: transform .12s ease, filter .2s ease;
+    }
+    .remove-cart-btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+
+    #adminSection, #suggestionSection{
+      margin-top: 22px;
+      padding: 16px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    #adminSection h2, #suggestionSection h2{
+      margin: 0 0 8px;
+      font-size: 16px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: rgba(233,247,255,.92);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .admin-status{
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+
+    .admin-login-form{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items:center;
+      margin-bottom: 10px;
+    }
+
+    .admin-actions{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0 12px;
+    }
+
+    .admin-product-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .admin-product-grid textarea{
+      grid-column: 1 / -1;
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .admin-product-form-buttons{
+      margin-top: 10px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .admin-products-table{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+    .admin-products-table th,
+    .admin-products-table td{
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 10px;
+      text-align:left;
+      vertical-align: middle;
+    }
+    .admin-products-table th{
+      background: rgba(0,0,0,.15);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      font-size: 12px;
+    }
+
+    .mini-btn{
+      padding: 7px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(155,92,255,.25);
+      background: rgba(155,92,255,.10);
+      color: var(--text);
+      cursor:pointer;
+      margin-right: 6px;
+      box-shadow: 0 0 12px rgba(155,92,255,.20);
+    }
+
+    .category-manager{
+      margin: 14px 0 6px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.10));
+    }
+    .category-manager h3{
+      margin: 0 0 8px;
+      font-size: 14px;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      color: rgba(233,247,255,.92);
+      text-shadow: var(--glow-cyan);
+    }
+    .category-row{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 0;
+      border-top: 1px dashed rgba(255,255,255,.10);
+    }
+    .category-row:first-of-type{ border-top: none; }
+    .cat-meta{
+      display:flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .cat-key{
+      font-weight: 800;
+      letter-spacing: .2px;
+      word-break: break-word;
+    }
+    .cat-label{
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-word;
+    }
+    .cat-actions{ display:flex; gap: 6px; flex-wrap: wrap; }
+
+    .suggestion-form{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .suggestion-form textarea{
+      grid-column: 1 / -1;
+      min-height: 70px;
+    }
+    .suggestion-form button{
+      grid-column: 1 / -1;
+      justify-self: flex-start;
+    }
+
+    .suggestion-actions{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .suggestion-list{
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 240px;
+      overflow-y:auto;
+      padding-right: 4px;
+    }
+
+    .suggestion-card{
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.12));
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+
+    @media (max-width: 600px){
+      .top-bar{ flex-direction: column; align-items: flex-start; }
+      .search-box{ flex-direction: column; }
+      .search-box button{ width: 100%; }
+      .suggestion-form{ grid-template-columns: 1fr; }
+      .admin-product-grid{ grid-template-columns: 1fr; }
+      .search-box select{ flex: 1 1 auto; width: 100%; }
+      .quote-meta{ grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+
+<body class="dark">
+  <header class="sticky-header">
+    <div class="top-bar">
+      <h1 class="glitch" data-text="Welcome to IPAV's Secret Shop">Welcome to IPAV's Secret Shop</h1>
+      <button id="themeToggle" class="theme-toggle">Switch to Light Mode</button>
+    </div>
+
+    <div class="search-box">
+      <select id="categorySelect"></select>
+      <input type="text" id="searchInput" placeholder="Enter model, product name or brand" />
+      <button id="searchButton">Search</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main class="main">
+      <div id="noResult" class="no-result"></div>
+      <div id="loader" class="loader"></div>
+      <div id="resultsContainer"></div>
+    </main>
+
+    <aside class="sidebar">
+      <section id="cartSection" class="sticky-cart neon-frame">
+        <div class="cart-actions">
+          <span class="cart-count" id="cartCountText"></span>
+          <button class="download-quote-btn" onclick="downloadBOQCsv()">
+            Download BOQ (CSV)
+          </button>
+        </div>
+
+        <!-- Quote meta fields -->
+        <div class="quote-meta">
+          <input id="qmClient" placeholder="Client" />
+          <input id="qmLocation" placeholder="Location" />
+          <input id="qmDate" placeholder="Date Today (YYYY-MM-DD)" />
+          <input id="qmContact" placeholder="Contact" />
+          <input id="qmPhoneEmail" placeholder="Phone / Email" />
+          <input id="qmProject" class="full" placeholder="Project / Type / Name" />
+          <input id="qmAE" placeholder="Account Executive" />
+          <input id="qmEngineer" placeholder="AV Design Engineer" />
+          <input id="qmEws" placeholder="EWS Control No." />
+          <textarea id="qmNotes" placeholder="Notes"></textarea>
+        </div>
+
+        <div id="cartContainer"></div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- Admin Panel -->
+  <section id="adminSection">
+    <h2>Admin Panel</h2>
+    <p class="admin-status" id="adminStatusText">Not logged in.</p>
+
+    <div id="adminLoggedOut">
+      <form id="adminLoginForm" class="admin-login-form">
+        <input type="password" id="adminPassword" placeholder="Enter admin password" required />
+        <button type="submit">Login</button>
+      </form>
+      <p style="font-size:12px; opacity:0.7; margin:0;">
+        Note: This is a simple frontend-only password. Do not use a real company password here.
+      </p>
+    </div>
+
+    <div id="adminLoggedIn" style="display:none;">
+      <div class="admin-actions">
+        <button type="button" class="admin-btn" onclick="adminLogout()">Logout</button>
+        <button type="button" class="admin-btn" onclick="refreshFromBackend()">Refresh from backend</button>
+      </div>
+
+      <!-- Category Manager -->
+      <div class="category-manager">
+        <h3>Category Manager</h3>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+          <input id="newCatKey" placeholder="New category key (e.g. switcher)" style="flex:1 1 240px;" />
+          <input id="newCatLabel" placeholder="Label (optional, e.g. Switchers)" style="flex:1 1 240px;" />
+          <button type="button" class="admin-btn" onclick="addCategory()">Add category</button>
+        </div>
+        <div id="categoryList"></div>
+        <p style="font-size:12px; opacity:.75; margin:8px 0 0;">
+          Tip: Renaming a category key can optionally update existing products too.
+        </p>
+      </div>
+
+      <h3 style="margin:12px 0 6px; font-size:15px; letter-spacing:.4px; text-transform:uppercase;">
+        Manage Products
+      </h3>
+
+      <form id="productForm" class="admin-product-form">
+        <div class="admin-product-grid">
+          <input type="text" id="prodBrand" placeholder="Brand (e.g. DVDO)" />
+          <input type="text" id="prodModel" placeholder="Model (required)" required />
+          <input type="text" id="prodName" placeholder="Product name / title" />
+          <select id="prodCategory" required></select>
+          <input type="text" id="prodImage" placeholder="Image URL (optional)" />
+          <textarea id="prodDescription" placeholder="Description"></textarea>
+          <textarea id="prodSpecs" placeholder="Specs (one per line, e.g. Resolution: 1080p)"></textarea>
+        </div>
+
+        <div class="admin-product-form-buttons">
+          <button type="submit" id="productFormSubmitBtn">Add product</button>
+          <button type="button" id="productFormCancelEditBtn" style="display:none;" onclick="cancelProductEdit()">
+            Cancel edit
+          </button>
+        </div>
+
+        <p id="adminWarn" style="margin:10px 0 0; font-size:12px; color:rgba(255,43,214,.9); display:none;"></p>
+      </form>
+
+      <div id="adminProductsList"></div>
+    </div>
+  </section>
+
+  <!-- Suggestion Box -->
+  <section id="suggestionSection">
+    <h2>Product Suggestion Box</h2>
+    <p style="font-size:14px; opacity:0.8; margin:0 0 10px;">
+      Can't find a product? Suggest it here so it can be added to the inventory list.
+    </p>
+
+    <form id="suggestionForm" class="suggestion-form">
+      <input type="text" id="suggestBrand" placeholder="Brand (e.g. SONY)" required />
+      <input type="text" id="suggestModel" placeholder="Model (e.g. PXW-Z90)" required />
+      <input type="text" id="suggestName" placeholder="Product name / short title" />
+      <textarea id="suggestNotes" placeholder="Extra details (link, specs, customer request, etc.)"></textarea>
+      <button type="submit">Add suggestion</button>
+    </form>
+
+    <div class="suggestion-actions">
+      <span id="suggestionCountText">No suggestions yet.</span>
+      <button type="button" class="admin-btn" onclick="copySuggestions()">
+        Copy all suggestions
+      </button>
+    </div>
+
+    <div id="suggestionsList" class="suggestion-list"></div>
+  </section>
+
+  <script>
+    /***********************
+     * BACKEND CONFIG
+     ***********************/
+    const API_BASE = "https://script.google.com/macros/s/AKfycbzGVGW8EZ8R8Mi3gcXYJ7H6aJHtaK99CFkRK9Wp7q0nc8Z4FjnaD9DehlX51vMAEKcuSQ/exec";
+
+    async function apiGet(path){
+      const res = await fetch(`${API_BASE}?path=${encodeURIComponent(path)}`, { method: "GET", cache: "no-store" });
+      return await res.json();
+    }
+
+    // IMPORTANT: use text/plain to avoid CORS preflight issues
+    async function apiPost(action, payload = {}){
+      const res = await fetch(API_BASE, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action, ...payload })
+      });
+      return await res.json();
+    }
+
+    /***********************
+     * DEFAULT DATA (fallback only)
+     ***********************/
+    const DEFAULT_PRODUCTS = [
+      { model:"DVDO-C4-1-B", brand:"DVDO", name:"DVDO PTZ CAMERA 1080P", category:"camera",
+        description:"Full HD PTZ Camera with HDMI/IP/3G-SDI/USB & AI Auto Tracking (Black)",
+        image:"https://dvdo.com/cdn/shop/products/DVDO-C4-1-2_700x.png?v=1672342619",
+        specs:{ "Resolution":"1080p","Outputs":"HDMI, 3G-SDI, USB, IP","AI Auto Tracking":"Yes","Optical Zoom":"12x","Color":"Black" }
+      },
+      { model:"DVDO-C5-1-B", brand:"DVDO", name:"DVDO PTZ CAMERA 4K", category:"camera",
+        description:"4K PTZ Camera with HDMI/IP/3G-SDI/USB & AI Auto Tracking (Black)",
+        image:"https://dvdo.com/cdn/shop/files/C5-1BlackFront-croppednoshade_700x.png?v=1713050748",
+        specs:{ "Resolution":"4K","Outputs":"HDMI, 3G-SDI, USB, IP","AI Auto Tracking":"Yes","Optical Zoom":"12x","Color":"Black" }
+      },
+      { model:"DVDO-CB-5-B", brand:"DVDO", name:"DVDO PTZ CAMERA BRACKET", category:"accessory",
+        description:"Black Ceiling Bracket for C3 & C7WIFI PTZ Cameras",
+        image:"https://dvdo.com/cdn/shop/files/DVDO-CB-5-Bpicture1_1024x.jpg?v=1748024159",
+        specs:{ "Type":"Ceiling Bracket","Compatible Models":"C3, C7WIFI","Color":"Black","Material":"Metal" }
+      }
+    ];
+
+    /***********************
+     * STATE
+     ***********************/
+    let products = [];
+    let categories = []; // array of {category,label}
+    let cart = [];
+    let suggestions = [];
+
+    let isAdmin = false;
+    let editingProductIndex = null;
+
+    const ADMIN_SESSION_KEY = "inventoryIsAdmin";
+    const ADMIN_PASSWORD = "microdata"; // front-end only
+
+    const SUGGESTIONS_STORAGE_KEY = "inventorySuggestions";
+    const QUOTE_META_KEY = "inventoryQuoteMeta";
+
+    let quoteMeta = {
+      client: "",
+      location: "",
+      dateToday: new Date().toISOString().slice(0,10),
+      contact: "",
+      phoneEmail: "",
+      projectName: "",
+      accountExecutive: "",
+      avEngineer: "",
+      ewsControlNo: "",
+      notes: ""
+    };
+
+    /***********************
+     * DOM
+     ***********************/
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    const noResultEl = document.getElementById("noResult");
+    const resultsContainer = document.getElementById("resultsContainer");
+    const loader = document.getElementById("loader");
+    const categorySelect = document.getElementById("categorySelect");
+    const themeToggle = document.getElementById("themeToggle");
+
+    const cartSection = document.getElementById("cartSection");
+    const cartContainer = document.getElementById("cartContainer");
+    const cartCountText = document.getElementById("cartCountText");
+
+    // Quote meta inputs
+    const qmClient = document.getElementById("qmClient");
+    const qmLocation = document.getElementById("qmLocation");
+    const qmDate = document.getElementById("qmDate");
+    const qmContact = document.getElementById("qmContact");
+    const qmPhoneEmail = document.getElementById("qmPhoneEmail");
+    const qmProject = document.getElementById("qmProject");
+    const qmAE = document.getElementById("qmAE");
+    const qmEngineer = document.getElementById("qmEngineer");
+    const qmEws = document.getElementById("qmEws");
+    const qmNotes = document.getElementById("qmNotes");
+
+    const suggestionForm = document.getElementById("suggestionForm");
+    const suggestBrandInput = document.getElementById("suggestBrand");
+    const suggestModelInput = document.getElementById("suggestModel");
+    const suggestNameInput = document.getElementById("suggestName");
+    const suggestNotesInput = document.getElementById("suggestNotes");
+    const suggestionsListEl = document.getElementById("suggestionsList");
+    const suggestionCountText = document.getElementById("suggestionCountText");
+
+    const adminLoginForm = document.getElementById("adminLoginForm");
+    const adminPasswordInp = document.getElementById("adminPassword");
+    const adminLoggedOut = document.getElementById("adminLoggedOut");
+    const adminLoggedIn = document.getElementById("adminLoggedIn");
+    const adminStatusText = document.getElementById("adminStatusText");
+
+    const productForm = document.getElementById("productForm");
+    const prodBrandInput = document.getElementById("prodBrand");
+    const prodModelInput = document.getElementById("prodModel");
+    const prodNameInput = document.getElementById("prodName");
+    const prodCategorySelect = document.getElementById("prodCategory");
+    const prodImageInput = document.getElementById("prodImage");
+    const prodDescriptionInput = document.getElementById("prodDescription");
+    const prodSpecsInput = document.getElementById("prodSpecs");
+    const productFormSubmitBtn = document.getElementById("productFormSubmitBtn");
+    const productFormCancelEditBtn = document.getElementById("productFormCancelEditBtn");
+    const adminProductsList = document.getElementById("adminProductsList");
+    const adminWarn = document.getElementById("adminWarn");
+
+    const categoryListEl = document.getElementById("categoryList");
+    const newCatKeyInp = document.getElementById("newCatKey");
+    const newCatLabelInp = document.getElementById("newCatLabel");
+
+    /***********************
+     * UTIL
+     ***********************/
+    function formatCategoryLabel(cat){
+      return (cat || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[_-]+/g, " ")
+        .split(" ")
+        .filter(Boolean)
+        .map(w => (w.length <= 3 ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1)))
+        .join(" ");
+    }
+
+    function normalizeText(s){
+      return String(s || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    }
+
+    // Simple similarity: token overlap + substring checks
+    function looksSimilarName(a, b){
+      const A = normalizeText(a);
+      const B = normalizeText(b);
+      if(!A || !B) return false;
+      if(A === B) return true;
+      if(A.includes(B) || B.includes(A)) return true;
+
+      const aTokens = new Set(A.split(" ").filter(Boolean));
+      const bTokens = new Set(B.split(" ").filter(Boolean));
+      if(aTokens.size === 0 || bTokens.size === 0) return false;
+
+      let overlap = 0;
+      for(const t of aTokens) if(bTokens.has(t)) overlap++;
+      const ratio = overlap / Math.max(aTokens.size, bTokens.size);
+      return ratio >= 0.6;
+    }
+
+    function parseSpecsFromString(text){
+      const specs = {};
+      if(!text) return specs;
+      text.split(/\r?\n/).forEach(line=>{
+        const trimmed = line.trim();
+        if(!trimmed) return;
+        const [key, ...rest] = trimmed.split(":");
+        const value = rest.join(":").trim();
+        if(key) specs[key.trim()] = value || "";
+      });
+      return specs;
+    }
+
+    function specsToText(specs){
+      if(!specs || typeof specs !== "object") return "";
+      return Object.entries(specs).map(([k,v])=>`${k}: ${v}`).join("\n");
+    }
+
+    function csvEscape(value){
+      if(value == null) return "";
+      const str = String(value);
+      if(/[",\n\r]/.test(str)) return '"' + str.replace(/"/g, '""') + '"';
+      return str;
+    }
+
+    function peso(n){
+      const num = Number(n || 0);
+      if(Number.isNaN(num)) return 0;
+      return num;
+    }
+
+    /***********************
+     * THEME
+     ***********************/
+    function applyTheme(theme){
+      document.body.classList.remove("dark", "light");
+      document.body.classList.add(theme);
+      themeToggle.textContent = theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode";
+      localStorage.setItem("inventoryTheme", theme);
+    }
+    (function initTheme(){
+      const saved = localStorage.getItem("inventoryTheme");
+      if(saved === "dark" || saved === "light") applyTheme(saved);
+      else applyTheme("dark");
+    })();
+    themeToggle.addEventListener("click", ()=>{
+      const current = document.body.classList.contains("dark") ? "dark" : "light";
+      applyTheme(current === "dark" ? "light" : "dark");
+    });
+
+    /***********************
+     * BACKEND LOAD
+     ***********************/
+    async function loadProductsFromBackend(){
+      try{
+        const out = await apiGet("products");
+        if(out && out.ok && Array.isArray(out.data)){
+          products = out.data.map(p => ({
+            model: (p.model || "").trim(),
+            brand: p.brand || "",
+            name: p.name || "",
+            category: (p.category || "").trim().toLowerCase(),
+            description: p.description || "",
+            image: p.image || "",
+            specs: (p.specs && typeof p.specs === "object") ? p.specs : {}
+          }));
+          return true;
+        }
+      }catch(e){
+        console.warn("Backend products load failed:", e);
+      }
+      products = DEFAULT_PRODUCTS.slice();
+      return false;
+    }
+
+    async function loadCategoriesFromBackend(){
+      try{
+        const out = await apiGet("categories");
+        if(out && out.ok && Array.isArray(out.data)){
+          categories = out.data
+            .map(x => ({
+              category: String(x.category || "").trim().toLowerCase(),
+              label: String(x.label || "").trim()
+            }))
+            .filter(x => x.category);
+          // fallback labels
+          categories.forEach(c => { if(!c.label) c.label = formatCategoryLabel(c.category); });
+          categories.sort((a,b)=>a.category.localeCompare(b.category));
+          return true;
+        }
+      }catch(e){
+        console.warn("Backend categories load failed:", e);
+      }
+
+      categories = [
+        { category:"camera", label:"Cameras" },
+        { category:"converter", label:"Converters" },
+        { category:"accessory", label:"Accessories" }
+      ];
+      return false;
+    }
+
+    async function refreshFromBackend(){
+      loader.style.display = "block";
+      await loadProductsFromBackend();
+      await loadCategoriesFromBackend();
+      loader.style.display = "none";
+      renderCategoryOptions();
+      renderAdminCategoryDropdown();
+      renderCategoryManager();
+      renderAdminProducts();
+      searchProduct();
+      alert("Refreshed from backend.");
+    }
+
+    /***********************
+     * CATEGORY DROPDOWNS
+     ***********************/
+    function renderCategoryOptions(){
+      const cats = categories.length ? categories : deriveCategoriesFromProducts_();
+      categorySelect.innerHTML = `
+        <option value="all">All Categories</option>
+        ${cats.map(c => `
+          <option value="${c.category}">${c.label || formatCategoryLabel(c.category)}</option>
+        `).join("")}
+      `;
+      if(!categorySelect.value) categorySelect.value = "all";
+    }
+
+    function renderAdminCategoryDropdown(selectedValue = ""){
+      const selected = (selectedValue || "").trim().toLowerCase();
+      const cats = categories.length ? categories : deriveCategoriesFromProducts_();
+
+      prodCategorySelect.innerHTML = `
+        <option value="" disabled ${selected ? "" : "selected"}>Select category</option>
+        ${cats.map(c => `
+          <option value="${c.category}" ${c.category === selected ? "selected" : ""}>
+            ${c.label || formatCategoryLabel(c.category)}
+          </option>
+        `).join("")}
+        <option value="__add_new__">+ Add new category...</option>
+      `;
+    }
+
+    function deriveCategoriesFromProducts_(){
+      const set = new Set(
+        products.map(p => (p.category || "").trim().toLowerCase()).filter(Boolean)
+      );
+      const arr = Array.from(set).sort();
+      return arr.map(c => ({ category:c, label: formatCategoryLabel(c) }));
+    }
+
+    prodCategorySelect.addEventListener("change", async (e)=>{
+      if(e.target.value === "__add_new__"){
+        let key = prompt("Enter new category key (e.g. switcher, mic, tripod):", "");
+        if(!key){
+          renderAdminCategoryDropdown();
+          return;
+        }
+        key = String(key).trim().toLowerCase();
+        if(!key){
+          renderAdminCategoryDropdown();
+          return;
+        }
+        const label = prompt("Enter label (optional):", formatCategoryLabel(key)) || formatCategoryLabel(key);
+
+        const res = await apiPost("upsert_category", { category: { category: key, label } });
+        if(!res || !res.ok){
+          alert("Failed to add category to backend.");
+          renderAdminCategoryDropdown();
+          return;
+        }
+
+        await loadCategoriesFromBackend();
+        renderCategoryOptions();
+        renderAdminCategoryDropdown(key);
+        renderCategoryManager();
+        searchProduct();
+      }
+    });
+
+    /***********************
+     * CATEGORY MANAGER
+     ***********************/
+    function renderCategoryManager(){
+      if(!isAdmin){
+        categoryListEl.innerHTML = `<p style="font-size:13px; opacity:.8; margin:0;">Login as admin to manage categories.</p>`;
+        return;
+      }
+      if(!categories.length){
+        categoryListEl.innerHTML = `<p style="font-size:13px; opacity:.8; margin:0;">No categories found.</p>`;
+        return;
+      }
+
+      categoryListEl.innerHTML = categories.map(c => `
+        <div class="category-row">
+          <div class="cat-meta">
+            <div class="cat-key">${c.category}</div>
+            <div class="cat-label">${c.label || ""}</div>
+          </div>
+          <div class="cat-actions">
+            <button class="mini-btn" type="button" onclick="renameCategoryLabel('${c.category}')">Rename label</button>
+            <button class="mini-btn" type="button" onclick="renameCategoryKey('${c.category}')">Rename key</button>
+            <button class="mini-btn" type="button" onclick="deleteCategory('${c.category}')">Delete</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function addCategory(){
+      if(!isAdmin) return alert("Admin only.");
+      let key = (newCatKeyInp.value || "").trim().toLowerCase();
+      let label = (newCatLabelInp.value || "").trim();
+
+      if(!key) return alert("Please enter a category key.");
+      if(!label) label = formatCategoryLabel(key);
+
+      const res = await apiPost("upsert_category", { category: { category: key, label } });
+      if(!res || !res.ok) return alert("Failed to add category.");
+
+      newCatKeyInp.value = "";
+      newCatLabelInp.value = "";
+
+      await loadCategoriesFromBackend();
+      renderCategoryOptions();
+      renderAdminCategoryDropdown(prodCategorySelect.value);
+      renderCategoryManager();
+      searchProduct();
+    }
+
+    async function renameCategoryLabel(catKey){
+      if(!isAdmin) return;
+      const c = categories.find(x => x.category === catKey);
+      const current = c ? (c.label || formatCategoryLabel(catKey)) : formatCategoryLabel(catKey);
+
+      const label = prompt(`New label for "${catKey}":`, current);
+      if(label == null) return;
+
+      const res = await apiPost("upsert_category", { category: { category: catKey, label: String(label).trim() } });
+      if(!res || !res.ok) return alert("Failed to rename label.");
+
+      await loadCategoriesFromBackend();
+      renderCategoryOptions();
+      renderAdminCategoryDropdown(prodCategorySelect.value);
+      renderCategoryManager();
+      searchProduct();
+    }
+
+    // Renaming key is more complex: can update products too
+    async function renameCategoryKey(oldKey){
+      if(!isAdmin) return;
+      let newKey = prompt(`Rename category key:\n\nOld: ${oldKey}\nNew (e.g. switcher):`, oldKey);
+      if(newKey == null) return;
+      newKey = String(newKey).trim().toLowerCase();
+      if(!newKey) return;
+
+      const shouldUpdateProducts = confirm(
+        `Also update ALL products using category "${oldKey}" to "${newKey}"?\n\nOK = update products\nCancel = rename category only`
+      );
+
+      // Create new key (keep label from old)
+      const oldObj = categories.find(x => x.category === oldKey);
+      const label = oldObj?.label || formatCategoryLabel(newKey);
+
+      let res = await apiPost("upsert_category", { category: { category: newKey, label } });
+      if(!res || !res.ok) return alert("Failed to create new category key.");
+
+      // Delete old key
+      res = await apiPost("delete_category", { category: oldKey });
+      if(!res || !res.ok) return alert("Failed to delete old category key.");
+
+      if(shouldUpdateProducts){
+        // Update products in backend
+        const affected = products.filter(p => (p.category || "").trim().toLowerCase() === oldKey);
+        for(const p of affected){
+          const updated = { ...p, category: newKey };
+          const r = await apiPost("upsert_product", { product: updated });
+          if(!r || !r.ok){
+            alert(`Failed updating product ${p.model}. Stopping.`);
+            break;
+          }
+        }
+        await loadProductsFromBackend();
+      }
+
+      await loadCategoriesFromBackend();
+      renderCategoryOptions();
+      renderAdminCategoryDropdown(newKey);
+      renderCategoryManager();
+      renderAdminProducts();
+      searchProduct();
+    }
+
+    async function deleteCategory(catKey){
+      if(!isAdmin) return;
+      const usedCount = products.filter(p => (p.category || "").trim().toLowerCase() === catKey).length;
+      const ok = confirm(
+        `Delete category "${catKey}"?\n\nProducts using it: ${usedCount}\n\n(Products will keep their category value, but dropdown list will no longer include it.)`
+      );
+      if(!ok) return;
+
+      const res = await apiPost("delete_category", { category: catKey });
+      if(!res || !res.ok) return alert("Failed to delete category.");
+
+      await loadCategoriesFromBackend();
+      renderCategoryOptions();
+      renderAdminCategoryDropdown(prodCategorySelect.value);
+      renderCategoryManager();
+      searchProduct();
+    }
+
+    /***********************
+     * SEARCH
+     ***********************/
+    function searchProduct(){
+      const query = searchInput.value.trim().toLowerCase();
+      const selectedCategory = categorySelect.value;
+
+      loader.style.display = "block";
+      resultsContainer.innerHTML = "";
+      noResultEl.style.display = "none";
+
+      setTimeout(()=>{
+        const matches = products.filter(p=>{
+          const model = (p.model || "").toLowerCase();
+          const name  = (p.name || "").toLowerCase();
+          const brand = (p.brand || "").toLowerCase();
+
+          const matchesText = !query || model.includes(query) || name.includes(query) || brand.includes(query);
+
+          const pCat = (p.category || "").trim().toLowerCase();
+          const matchesCategory = (selectedCategory === "all") || (pCat === selectedCategory);
+
+          return matchesText && matchesCategory;
+        });
+
+        loader.style.display = "none";
+
+        if(matches.length === 0){
+          noResultEl.textContent = "No product found.";
+          noResultEl.style.display = "block";
+          return;
+        }
+
+        matches.forEach(product=>{
+          const card = document.createElement("div");
+          card.className = "result-card";
+
+          const catObj = categories.find(c => c.category === (product.category || "").toLowerCase());
+          const catLabel = catObj ? catObj.label : formatCategoryLabel(product.category || "");
+
+          card.innerHTML = `
+            <div class="result-header">
+              <div>
+                <p class="result-model">Model: ${product.model}</p>
+                <h2 class="result-name">${product.name || "-"}</h2>
+                <p class="result-meta">
+                  <strong>Brand:</strong> ${product.brand || "-"}
+                  <span class="chip">${catLabel}</span>
+                </p>
+              </div>
+              <div class="result-actions">
+                <button class="add-cart-btn" onclick="addToCart('${escapeQuotes_(product.model)}')">Add to cart</button>
+              </div>
+            </div>
+            <p class="result-description">${product.description || ""}</p>
+            ${product.image ? `<img class="result-image" src="${product.image}" alt="${escapeHtml_(product.name || "")}">` : ""}
+          `;
+
+          resultsContainer.appendChild(card);
+        });
+      }, 200);
+    }
+
+    function escapeHtml_(s){
+      return String(s||"")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function escapeQuotes_(s){
+      return String(s||"").replaceAll("'", "\\'");
+    }
+
+    searchButton.addEventListener("click", searchProduct);
+    searchInput.addEventListener("keydown", (event)=>{ if(event.key === "Enter") searchProduct(); });
+    categorySelect.addEventListener("change", searchProduct);
+
+    /***********************
+     * CART + QUOTE META
+     ***********************/
+    function loadQuoteMeta(){
+      try{
+        const raw = localStorage.getItem(QUOTE_META_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          quoteMeta = { ...quoteMeta, ...(parsed || {}) };
+        }
+      }catch(e){}
+    }
+
+    function saveQuoteMeta(){
+      localStorage.setItem(QUOTE_META_KEY, JSON.stringify(quoteMeta));
+    }
+
+    function bindQuoteMetaInputs(){
+      qmClient.value = quoteMeta.client || "";
+      qmLocation.value = quoteMeta.location || "";
+      qmDate.value = quoteMeta.dateToday || new Date().toISOString().slice(0,10);
+      qmContact.value = quoteMeta.contact || "";
+      qmPhoneEmail.value = quoteMeta.phoneEmail || "";
+      qmProject.value = quoteMeta.projectName || "";
+      qmAE.value = quoteMeta.accountExecutive || "";
+      qmEngineer.value = quoteMeta.avEngineer || "";
+      qmEws.value = quoteMeta.ewsControlNo || "";
+      qmNotes.value = quoteMeta.notes || "";
+
+      const handler = () => {
+        quoteMeta.client = qmClient.value.trim();
+        quoteMeta.location = qmLocation.value.trim();
+        quoteMeta.dateToday = qmDate.value.trim();
+        quoteMeta.contact = qmContact.value.trim();
+        quoteMeta.phoneEmail = qmPhoneEmail.value.trim();
+        quoteMeta.projectName = qmProject.value.trim();
+        quoteMeta.accountExecutive = qmAE.value.trim();
+        quoteMeta.avEngineer = qmEngineer.value.trim();
+        quoteMeta.ewsControlNo = qmEws.value.trim();
+        quoteMeta.notes = qmNotes.value.trim();
+        saveQuoteMeta();
+      };
+
+      [qmClient,qmLocation,qmDate,qmContact,qmPhoneEmail,qmProject,qmAE,qmEngineer,qmEws,qmNotes]
+        .forEach(el => el.addEventListener("input", handler));
+    }
+
+    function addToCart(model){
+      const product = products.find(p=>p.model === model);
+      if(!product) return;
+
+      const existing = cart.find(item=>item.model === model);
+      if(existing) existing.quantity += 1;
+      else{
+        cart.push({
+          model: product.model,
+          name: product.name,
+          brand: product.brand || "",
+          description: product.description || "",
+          quantity: 1,
+          unitCost: 0
+        });
+      }
+      renderCart();
+    }
+
+    function removeFromCart(model){
+      cart = cart.filter(item=>item.model !== model);
+      renderCart();
+    }
+
+    function updateCartQuantity(model, newQty){
+      const qty = parseInt(newQty, 10);
+      if(isNaN(qty) || qty <= 0) return;
+      const item = cart.find(i=>i.model === model);
+      if(!item) return;
+      item.quantity = qty;
+      renderCart();
+    }
+
+    function updateCartUnitCost(model, newCost){
+      const cost = Number(String(newCost).replace(/[, ]+/g,""));
+      if(Number.isNaN(cost) || cost < 0) return;
+      const item = cart.find(i=>i.model === model);
+      if(!item) return;
+      item.unitCost = cost;
+      renderCart();
+    }
+
+    function renderCart(){
+      if(cart.length === 0){
+        cartSection.style.display = "none";
+        cartContainer.innerHTML = "";
+        cartCountText.textContent = "Cart is empty.";
+        return;
+      }
+
+      cartSection.style.display = "block";
+      const totalItems = cart.reduce((sum, item)=>sum + item.quantity, 0);
+      cartCountText.textContent = `Cart: ${cart.length} product(s), ${totalItems} item(s) total.`;
+
+      cartContainer.innerHTML = `
+        <div class="cart-list">
+          ${cart.map(item=>{
+            const total = peso(item.unitCost) * peso(item.quantity);
+            return `
+              <div class="cart-item">
+                <div class="cart-top">
+                  <div class="cart-title">
+                    <div class="brand">${escapeHtml_(item.brand || "-")}</div>
+                    <div class="model">${escapeHtml_(item.model)}</div>
+                  </div>
+                </div>
+
+                <div class="cart-desc">${escapeHtml_(item.description || "")}</div>
+
+                <div class="cart-controls">
+                  <div class="qty-wrap">
+                    <span>Qty</span>
+                    <input type="number" min="1" value="${item.quantity}"
+                      onchange="updateCartQuantity('${escapeQuotes_(item.model)}', this.value)" />
+                    <span style="margin-left:10px;">Unit Cost (₱)</span>
+                    <input type="number" min="0" step="0.01" value="${peso(item.unitCost)}"
+                      onchange="updateCartUnitCost('${escapeQuotes_(item.model)}', this.value)" />
+                    <span style="margin-left:10px;">Total: ₱${total.toFixed(2)}</span>
+                  </div>
+
+                  <button class="remove-cart-btn" onclick="removeFromCart('${escapeQuotes_(item.model)}')">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function downloadBOQCsv(){
+      if(cart.length === 0){
+        alert("Cart is empty. Add products before generating.");
+        return;
+      }
+
+      // BOQ-style output (header fields first)
+      const lines = [];
+      lines.push("ESTIMATED WORKSHEET");
+      lines.push(
+        ["CLIENT", csvEscape(quoteMeta.client), "Location", csvEscape(quoteMeta.location), "Date Today", csvEscape(quoteMeta.dateToday)].join(",")
+      );
+      lines.push(
+        ["CONTACT", csvEscape(quoteMeta.contact), "Account Executive", csvEscape(quoteMeta.accountExecutive)].join(",")
+      );
+      lines.push(
+        ["Phone/Fax-Email", csvEscape(quoteMeta.phoneEmail), "Av Design Engineer", csvEscape(quoteMeta.avEngineer)].join(",")
+      );
+      lines.push(
+        ["Project/Type/Name", csvEscape(quoteMeta.projectName), "EWS Control No.", csvEscape(quoteMeta.ewsControlNo)].join(",")
+      );
+      lines.push("Notes," + csvEscape(quoteMeta.notes));
+      lines.push(""); // blank line
+
+      // Items table
+      lines.push("Item,Brand,Model,Specification,Qty,UOM,COST,TOTAL COST,Price or Mark Up Level");
+
+      cart.forEach((item, idx)=>{
+        const total = peso(item.unitCost) * peso(item.quantity);
+        lines.push([
+          idx + 1,
+          csvEscape(item.brand || ""),
+          csvEscape(item.model || ""),
+          csvEscape(item.description || ""),
+          csvEscape(item.quantity),
+          "unit(s)",
+          csvEscape(peso(item.unitCost).toFixed(2)),
+          csvEscape(total.toFixed(2)),
+          ""
+        ].join(","));
+      });
+
+      const csvContent = lines.join("\r\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const today = new Date().toISOString().slice(0,10);
+      link.href = url;
+      link.download = `estimated_worksheet_${today}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    /***********************
+     * SUGGESTIONS (still local)
+     ***********************/
+    function loadSuggestions(){
+      try{
+        const raw = localStorage.getItem(SUGGESTIONS_STORAGE_KEY);
+        if(raw) suggestions = JSON.parse(raw) || [];
+      }catch(e){ suggestions = []; }
+      renderSuggestions();
+    }
+
+    function saveSuggestions(){
+      localStorage.setItem(SUGGESTIONS_STORAGE_KEY, JSON.stringify(suggestions));
+    }
+
+    function renderSuggestions(){
+      if(!suggestions.length){
+        suggestionsListEl.innerHTML = "";
+        suggestionCountText.textContent = "No suggestions yet.";
+        return;
+      }
+
+      suggestionCountText.textContent = `Total suggestions: ${suggestions.length}`;
+      suggestionsListEl.innerHTML = suggestions.map((s)=>`
+        <div class="suggestion-card">
+          <div style="font-weight:800; margin-bottom:6px;">${escapeHtml_(s.brand || "-")} • ${escapeHtml_(s.model || "-")}</div>
+          <div style="font-size:12px; opacity:.75; margin-bottom:6px;">${escapeHtml_(s.name || "")} • ${escapeHtml_(s.createdAt || "")}</div>
+          <div>${escapeHtml_(s.notes || "")}</div>
+        </div>
+      `).join("");
+    }
+
+    suggestionForm.addEventListener("submit", (event)=>{
+      event.preventDefault();
+
+      const brand = suggestBrandInput.value.trim();
+      const model = suggestModelInput.value.trim();
+      const name  = suggestNameInput.value.trim();
+      const notes = suggestNotesInput.value.trim();
+
+      if(!brand || !model){
+        alert("Please provide at least Brand and Model.");
+        return;
+      }
+
+      const createdAt = new Date().toLocaleString();
+      suggestions.push({ brand, model, name, notes, createdAt });
+      saveSuggestions();
+      renderSuggestions();
+
+      suggestionForm.reset();
+      suggestBrandInput.focus();
+    });
+
+    function copySuggestions(){
+      if(!suggestions.length){
+        alert("No suggestions to copy.");
+        return;
+      }
+      const lines = [];
+      lines.push("Brand,Model,Name,Notes,Created At");
+      suggestions.forEach(s=>{
+        lines.push([
+          csvEscape(s.brand || ""),
+          csvEscape(s.model || ""),
+          csvEscape(s.name || ""),
+          csvEscape(s.notes || ""),
+          csvEscape(s.createdAt || "")
+        ].join(","));
+      });
+
+      const text = lines.join("\n");
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text)
+          .then(()=>alert("All suggestions copied to clipboard."))
+          .catch(()=>alert("Failed to copy. You can select and copy manually."));
+      }else{
+        alert("Clipboard not available. You can select and copy the text manually.");
+      }
+    }
+
+    /***********************
+     * ADMIN: PRODUCTS (backend)
+     ***********************/
+    function updateAdminUI(){
+      if(isAdmin){
+        adminLoggedIn.style.display = "block";
+        adminLoggedOut.style.display = "none";
+        adminStatusText.textContent = "Admin logged in.";
+      }else{
+        adminLoggedIn.style.display = "none";
+        adminLoggedOut.style.display = "block";
+        adminStatusText.textContent = "Not logged in.";
+      }
+      renderCategoryManager();
+      renderAdminProducts();
+    }
+
+    adminLoginForm.addEventListener("submit", (event)=>{
+      event.preventDefault();
+      const pwd = adminPasswordInp.value;
+      if(pwd === ADMIN_PASSWORD){
+        isAdmin = true;
+        sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
+        adminPasswordInp.value = "";
+        updateAdminUI();
+      }else{
+        alert("Incorrect admin password.");
+      }
+    });
+
+    function adminLogout(){
+      isAdmin = false;
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      updateAdminUI();
+    }
+
+    function initAdmin(){
+      const stored = sessionStorage.getItem(ADMIN_SESSION_KEY);
+      if(stored === "true") isAdmin = true;
+      updateAdminUI();
+    }
+
+    function renderAdminProducts(){
+      if(!isAdmin){
+        adminProductsList.innerHTML = `
+          <p style="font-size:13px; opacity:0.8; margin:0;">
+            Login as admin to manage products.
+          </p>`;
+        return;
+      }
+
+      if(!products.length){
+        adminProductsList.innerHTML = `
+          <p style="font-size:13px; opacity:0.8; margin:0;">
+            No products found.
+          </p>`;
+        return;
+      }
+
+      const rowsHtml = products.map((p, index)=>{
+        const catObj = categories.find(c => c.category === (p.category || "").toLowerCase());
+        const catLabel = catObj ? catObj.label : formatCategoryLabel(p.category || "");
+        return `
+          <tr>
+            <td>${escapeHtml_(p.brand || "-")}</td>
+            <td>${escapeHtml_(p.model)}</td>
+            <td>${escapeHtml_(p.name || "")}</td>
+            <td>${escapeHtml_(catLabel)}</td>
+            <td>
+              <button type="button" class="mini-btn" onclick="startEditProduct(${index})">Edit</button>
+              <button type="button" class="mini-btn" onclick="deleteProduct(${index})">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      adminProductsList.innerHTML = `
+        <table class="admin-products-table">
+          <tr>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Actions</th>
+          </tr>
+          ${rowsHtml}
+        </table>`;
+    }
+
+    // Duplicate detection (same model / similar name)
+    function checkDuplicatesForAdmin_(draft, ignoreIndex = null){
+      const warnings = [];
+
+      const draftModel = String(draft.model || "").trim().toLowerCase();
+      const draftName  = String(draft.name || "").trim();
+
+      products.forEach((p, idx)=>{
+        if(ignoreIndex !== null && idx === ignoreIndex) return;
+
+        const model = String(p.model || "").trim().toLowerCase();
+        const name  = String(p.name || "").trim();
+
+        if(draftModel && model === draftModel){
+          warnings.push(`Same MODEL already exists: ${p.model}`);
+        }
+        if(draftName && name && looksSimilarName(draftName, name)){
+          warnings.push(`Similar NAME exists: "${p.name}" (Model: ${p.model})`);
+        }
+      });
+
+      return warnings;
+    }
+
+    function showAdminWarn_(warnings){
+      if(!warnings.length){
+        adminWarn.style.display = "none";
+        adminWarn.textContent = "";
+        return;
+      }
+      adminWarn.style.display = "block";
+      adminWarn.textContent = "Duplicate warning: " + warnings.join(" | ");
+    }
+
+    // Live warn as user types
+    ["input","change"].forEach(evt=>{
+      prodModelInput.addEventListener(evt, ()=> liveAdminWarn_());
+      prodNameInput.addEventListener(evt, ()=> liveAdminWarn_());
+    });
+
+    function liveAdminWarn_(){
+      if(!isAdmin) return;
+      const draft = {
+        model: prodModelInput.value,
+        name: prodNameInput.value
+      };
+      const warns = checkDuplicatesForAdmin_(draft, editingProductIndex);
+      showAdminWarn_(warns);
+    }
+
+    productForm.addEventListener("submit", async (event)=>{
+      event.preventDefault();
+      if(!isAdmin){ alert("Admin only."); return; }
+
+      const brand = prodBrandInput.value.trim();
+      const model = prodModelInput.value.trim();
+      const name = prodNameInput.value.trim();
+      let category = String(prodCategorySelect.value || "").trim().toLowerCase();
+      const image = prodImageInput.value.trim();
+      const description = prodDescriptionInput.value.trim();
+      const specsText = prodSpecsInput.value.trim();
+      const specs = parseSpecsFromString(specsText);
+
+      if(!model){ alert("Model is required."); return; }
+      if(!category || category === "__add_new__"){ alert("Select a valid category."); return; }
+
+      const productData = {
+        model,
+        brand,
+        name: name || `${brand} ${model}`.trim() || "New Product",
+        category,
+        description,
+        image,
+        specs
+      };
+
+      // Duplicate detection confirm
+      const warnings = checkDuplicatesForAdmin_(productData, editingProductIndex);
+      showAdminWarn_(warnings);
+      if(warnings.length){
+        const ok = confirm("Duplicate warning detected:\n\n- " + warnings.join("\n- ") + "\n\nDo you still want to save?");
+        if(!ok) return;
+      }
+
+      // Save to backend
+      const res = await apiPost("upsert_product", { product: productData });
+      if(!res || !res.ok){
+        alert("Failed to save product to backend. Check deployment permissions / access.");
         return;
       }
 
